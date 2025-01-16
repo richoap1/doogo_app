@@ -1,0 +1,130 @@
+/* Chat Popup Styles */
+.chat-popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 80px; /* Position just above the footer */
+    right: 20px;
+    width: 350px; /* Width of the chat popup */
+    background-color: #fff; /* Background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    z-index: 1000; /* Ensure it appears above other elements */
+    flex-direction: column; /* Stack children vertically */
+}
+
+/* Header styles */
+.chat-header {
+    background-color: #4a90e2; /* Header color */
+    color: white; /* Text color */
+    padding: 10px; /* Padding around header */
+    border-top-left-radius: 8px; /* Rounded corners */
+    border-top-right-radius: 8px; /* Rounded corners */
+    display: flex; /* Flexbox for layout */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Center items vertically */
+}
+
+/* Close button styles */
+.close-chat {
+    background: none; /* No background */
+    border: none; /* No border */
+    color: white; /* Text color */
+    font-size: 18px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Chat body styles */
+.chat-body {
+    padding: 10px; /* Padding inside chat body */
+    max-height: 300px; /* Maximum height */
+    overflow-y: auto; /* Scroll if content exceeds max height */
+}
+
+/* Message styles */
+.message {
+    margin-bottom: 10px; /* Space between messages */
+    display: flex; /* Flexbox for layout */
+    flex-direction: column; /* Stack message elements vertically */
+}
+
+/* Message text styles */
+.message-text {
+    padding: 10px; /* Padding inside message */
+    border-radius: 5px; /* Rounded corners */
+    max-width: 80%; /* Maximum width of message */
+}
+
+/* Assistant message styles */
+.assistant .message-text {
+    background-color: #e1f5fe; /* Light blue for assistant */
+    align-self: flex-start; /* Align to the left */
+}
+
+/* User message styles */
+.user .message-text {
+    background-color: #ffe0b2; /* Light orange for user */
+    align-self: flex-end; /* Align to the right */
+}
+
+/* Message time styles */
+.message-time {
+    font-size: 12px; /* Font size for time */
+    color: gray; /* Text color */
+    margin-top: 2px; /* Space above time */
+}
+
+/* Input area styles */
+.chat-input {
+    display: flex; /* Flexbox for layout */
+    padding: 10px; /* Padding around input area */
+    border-top: 1px solid #ccc; /* Top border */
+}
+
+/* Input field styles */
+.chat-input input {
+    flex: 1; /* Take up remaining space */
+    padding: 10px; /* Padding inside input */
+    border: 1px solid #ccc; /* Border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Send button styles */
+.send-button {
+    background-color: #4a90e2; /* Button color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-left: 5px; /* Space between input and button */
+}
+
+/* Open chat button styles */
+.open-chat {
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* Distance from bottom */
+    right: 20px; /* Distance from right */
+    background-color: #ff4081; /* Pink color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 50%; /* Circular shape */
+    width: 60px; /* Width */
+    height: 60px; /* Height */
+    font-size: 24px; /* Icon size */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Center icon vertically */
+    justify-content: center; /* Center icon horizontally */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+/* Open chat button hover effect */
+.open-chat:hover {
+    background-color: #e91e63; /* Darker pink on hover */
+}
+
+/* Icon styles */
+.open-chat i {
+    margin: 0; /* Remove margin for icon */
+}

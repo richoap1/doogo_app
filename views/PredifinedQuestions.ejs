@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predefined Questions</title>
+    <style>
+        .predefined-questions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .predefined-questions button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .predefined-questions button:hover {
+            background-color: #357ab8;
+        }
+    </style>
+</head>
+<body>
+    <div id="predefined-questions" class="predefined-questions">
+        <button onclick="handlePredefinedQuestion('Halo')">Halo</button>
+        <button onclick="handlePredefinedQuestion('Bantuan')">Bantuan</button>
+        <button onclick="handlePredefinedQuestion('Apa kabar')">Apa kabar</button>
+        <button onclick="handlePredefinedQuestion('Informasi')">Informasi</button>
+        <button onclick="handlePredefinedQuestion('Produk')">Produk</button>
+        <button onclick="handlePredefinedQuestion('Layanan')">Layanan</button>
+        <button onclick="handlePredefinedQuestion('Jadwal')">Jadwal</button>
+    </div>
+</body>
+</html>

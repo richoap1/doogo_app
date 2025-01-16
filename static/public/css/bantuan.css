@@ -1,0 +1,61 @@
+/* General Styles */
+body {
+    font-family: 'Nunito', sans-serif;
+    background: #E7F4FC; /* Light background for the body */
+}
+
+/* Chat Container Styles */
+.chat-container {
+    border: 1px solid #ddd; /* Light border for chat container */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #fff; /* White background for chat */
+    padding: 20px; /* Padding inside chat container */
+    max-width: 600px; /* Maximum width for chat */
+    margin: 0 auto; /* Center the chat container */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+}
+
+/* Chat Box Styles */
+.chat-box {
+    height: 300px; /* Fixed height for chat box */
+    overflow-y: auto; /* Scrollable if content overflows */
+    margin-bottom: 10px; /* Space below chat box */
+    padding: 10px; /* Padding inside chat box */
+    border: 1px solid #ccc; /* Border for chat box */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Message Styles */
+.user-message {
+    background-color: #008FD5; /* User message background color */
+    color: white; /* User message text color */
+    padding: 10px; /* Padding for user message */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Space below user message */
+    text-align: right; /* Align user message to the right */
+}
+
+.admin-message {
+    background-color: #f1f1f1; /* Admin message background color */
+    color: black; /* Admin message text color */
+    padding: 10px; /* Padding for admin message */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Space below admin message */
+    text-align: left; /* Align admin message to the left */
+}
+
+/* Chat Input Styles */
+.chat-input {
+    display: flex; /* Flexbox for input and button */
+}
+
+.chat-input input[type="text"] {
+    flex: 1; /* Take up remaining space */
+    padding: 10px; /* Padding for input */
+    border: 1px solid #ccc; /* Border for input */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.chat-input button {
+    margin-left: 10px; /* Space between input and button */
+}

@@ -1,0 +1,288 @@
+/* General Styles */
+body {
+    font-family: 'Nunito', sans-serif;
+    background: #E7F4FC;
+}
+
+/* Header Styles */
+header {
+    background-color: #008FD5; /* Custom background color */
+}
+
+.logo {
+    width: 150px; /* Adjust logo size */
+}
+
+/* Layanan Section */
+.LayananKami {
+    padding: 40px 0; /* Padding for the section */
+    background: white; /* Background color for the section */
+}
+
+.Heading2LayananKami {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    color: black;
+    margin-bottom: 30px; /* Space below the heading */
+}
+
+/* Card Styles */
+.Link {
+    background: #008FD5;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s; /* Smooth hover effect */
+}
+
+.Link:hover {
+    transform: scale(1.05); /* Scale effect on hover */
+}
+
+/* Rectangle9 Styles */
+.Rectangle9 {
+    width: 200%;
+    height: 200px; /* Adjust height as needed */
+    background: #1570EF;
+    border-radius: 10px;
+    display: flex;
+    align-items: center; /* Center items vertically */
+    padding: 10px; /* Padding inside the rectangle */
+    color: white; /* Text color */
+    margin: 20px 0; /* Space above and below the rectangle */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+}
+
+.OrnamentOurServicesPng {
+    width: 50px; /* Set a smaller width for the image */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 10px; /* Space below the ornament */
+}
+
+.EGroceryDelivery, .HomeCleaning, .GroceryShopping {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center; /* Center text inside the rectangle */
+    margin-left: 10px; /* Space between icon and text */
+}
+
+/* Icon Styles */
+.iconify {
+    font-size: 24px; /* Adjust icon size */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+/* Ensure the row does not stack */
+.row {
+    display: flex; /* Use flexbox to ensure items are in a row */
+    flex-wrap: wrap; /* Allow wrapping if necessary */
+}
+
+.Rectangle9:hover {
+    background: #0f5bb5; /* Darker shade on hover */
+}
+
+/* Footer Styles */
+footer {
+    background-color: #008FD5; /* Custom footer background color */
+    color: white; /* Text color */
+    padding: 40px 0; /* Padding for the footer */
+}
+
+/* Widget Title Styles */
+.widget-title {
+    font-size: 18px; /* Font size for titles */
+    margin-bottom: 15px; /* Space below titles */
+    font-weight: bold; /* Make titles bold */
+}
+
+/* Menu List Styles */
+.menu-list {
+    padding: 0; /* Remove padding */
+}
+
+/* Menu Item Styles */
+.menu-item {
+    margin-bottom: 10px; /* Space between menu items */
+}
+
+/* Nav Link Styles */
+.nav-link {
+    color: white; /* Link color */
+    text-decoration: none; /* Remove underline */
+    transition: color 0.3s; /* Smooth color transition */
+}
+
+.nav-link:hover {
+    color: #ff4081; /* Change color on hover */
+}
+
+/* Social Links Styles */
+.social-links {
+    margin-top: 15px; /* Space above social links */
+}
+
+.social-links ul {
+    padding: 0; /* Remove padding */
+}
+
+.social-links li {
+    list-style: none; /* Remove bullet points */
+}
+
+/* Social Button Styles */
+.btn-outline-light {
+    border: 1px solid white; /* White border for social buttons */
+    color: white; /* Text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.btn-outline-light:hover {
+    background-color: white; /* Background color on hover */
+    color: #008FD5; /* Text color on hover */
+}
+
+/* Subscribe Section Styles */
+.footer-menu p {
+    margin: 10px 0; /* Space above and below the paragraph */
+}
+
+/* Input Field Styles */
+.form-control {
+    border: 1px solid #ccc; /* Border for input */
+    border-radius: 9px; /* Rounded corners */
+}
+
+/* Button Styles */
+.btn-dark {
+    background-color: #4a90e2; /* Button color */
+    color: white; /* Button text color */
+    border-radius: 9px; /* Rounded corners */
+}
+
+.btn-dark:hover {
+    background-color: #3a7bbf; /* Darker shade on hover */
+}
+
+/* Chat Popup Styles */
+.chat-popup {
+    position: fixed; /* Fix the chat popup */
+    bottom: 80px; /* Position above the footer */
+    right: 20px; /* Position from the right */
+    width: 300px; /* Width of the chat popup */
+    border: 1px solid #ccc; /* Border for the chat popup */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    background-color: white; /* Background color */
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
+/* Chat Header Styles */
+.chat-header {
+    background-color: #008FD5; /* Header background color */
+    color: white; /* Text color */
+    padding: 10px; /* Padding for the header */
+    display: flex; /* Flexbox for alignment */
+    justify-content: space-between; /* Space between title and close button */
+    align-items: center; /* Center items vertically */
+}
+
+/* Chat Body Styles */
+.chat-body {
+    height: 200px; /* Height of the chat body */
+    overflow-y: auto; /* Scroll if content overflows */
+    padding: 10px; /* Padding for the chat body */
+}
+
+/* Chat Input Styles */
+.chat-input {
+    display: flex; /* Flexbox for alignment */
+    padding: 10px; /* Padding for the input area */
+}
+
+.chat-input input {
+    flex: 1; /* Take up available space */
+    padding: 10px; /* Padding for the input */
+    border: 1px solid #ccc; /* Border for the input */
+    border-radius: 5px; /* Rounded corners */
+}
+
+.chat-input button {
+    padding: 10px; /* Padding for the button */
+    margin-left: 5px; /* Space between input and button */
+    background-color: #008FD5; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.chat-input button:hover {
+    background-color: #0f5bb5; /* Darker shade on hover */
+}
+
+/* Chat Message Styles */
+.chat-message {
+    margin: 5px 0; /* Space between messages */
+}
+
+/* Copyright Text Styles */
+.Copyright2023PtDoogoIndonesiaAllRightsReserved {
+    font-size: 14px; /* Font size for copyright */
+    margin: 0; /* Remove default margin */
+    text-align: center; /* Center the text */
+}
+
+/* Button Container Styles */
+.button-container {
+    display: flex; /* Use flexbox to align buttons in a row */
+    justify-content: center; /* Center the buttons horizontally */
+    gap: 20px; /* Space between the buttons */
+    margin: 0 auto; /* Center the container */
+    max-width: 600px; /* Optional: Set a max width for the container */
+}
+
+/* Rectangle9 Styles */
+.Rectangle9 {
+    width: 200px; /* Set a fixed width for the buttons */
+    height: 50px; /* Set a fixed height for the buttons */
+    border-radius: 10px; /* Rounded corners */
+    display: flex; /* Use flexbox for centering text */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    color: white; /* Text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+    transition: background 0.3s; /* Smooth background transition */
+}
+
+/* Specific Styles for Each Button */
+.go-shopping {
+    background: #1570EF; /* Background color for shopping button */
+}
+
+.go-cleaning {
+    background: #28A745; /* Background color for cleaning button */
+}
+
+/* Hover Effects */
+.go-shopping:hover {
+    background: #0f5bb5; /* Darker shade on hover for shopping */
+}
+
+.go-cleaning:hover {
+    background: #218838; /* Darker shade on hover for cleaning */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .Rectangle9 {
+        width: 150px; /* Adjust width for smaller screens */
+        height: 40px; /* Adjust height for smaller screens */
+    }
+
+
+}

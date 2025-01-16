@@ -1,0 +1,106 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-image: url('../images/Vector.png'); /* Path to your image */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+}
+
+/* Header */
+.bg-custom {
+    background: #7ed957; /* Updated background color for header and footer */
+}
+
+.TentangKami {
+    background-color: #E7F4FC; /* Light background color */
+    padding: 50px 0; /* Padding for the section */
+}
+
+.container {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: row; /* Align children in a row */
+    justify-content: space-between; /* Space between main and aside */
+}
+
+.icon-container {
+    display: flex; /* Flexbox for icons */
+    justify-content: space-around; /* Space between icons */
+    margin-bottom: 20px; /* Space below icons */
+}
+
+.icon {
+    text-align: center; /* Center the icon */
+}
+
+.icon img {
+    width: 100px; /* Set icon size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.Heading2TentangKami {
+    font-size: 1.5rem; /* Font size for the heading */
+    font-weight: bold; /* Bold text */
+    color: #333; /* Text color */
+    text-align: center; /* Center the heading */
+    margin-top: 20px; /* Space above the heading */
+}
+
+.Description {
+    background-color: #f5fbde; /* Light background color for contrast */
+    padding: 15px; /* Padding around the text */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-bottom: 15px; /* Space below the description */
+    font-size: 1rem; /* Font size */
+    color: #333; /* Text color */
+}
+
+.MoreAboutDoogo {
+    text-align: center; /* Center the button */
+}
+
+.MoreAboutDoogo .btn {
+    margin-top: 10px; /* Space above the button */
+    padding: 10px 20px; /* Padding for the button */
+    font-size: 1rem; /* Font size for the button */
+    border-radius: 7px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+.image-container {
+    text-align: center; /* Center the image */
+}
+
+.image-container img {
+    max-width: 100%; /* Responsive image */
+    height: auto; /* Maintain aspect ratio */
+}
+
+
+/* Footer Styles */
+footer {
+    background-color: #008FD5; /* Custom footer background color */
+    color: white; /* Text color */
+    padding: 40px 0; /* Padding for the footer */
+}
+
+/* Widget Title Styles */
+.widget-title {
+    font-size: 18px; /* Font size for titles */
+    margin-bottom: 15px; /* Space below titles */
+    font-weight: bold; /* Make titles bold */
+}
+
+/* Menu List Styles */
+.menu-list {
+    padding: 0; /* Remove padding */
+}
+
+/* Menu Item Styles */
+.menu-item {
+    margin-bottom: 10px; /* Space between menu items */
+}

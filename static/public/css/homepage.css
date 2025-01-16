@@ -1,0 +1,249 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif; /* Set a clean font */
+    background-color: #f8f9fa; /* Light background color */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+}
+
+/* Container Styles */
+.container {
+    max-width: 1440px; /* Set maximum width to 1440px */
+    margin: 0 auto; /* Center the container */
+    padding: 0 15px; /* Optional: Add some padding */
+}
+
+/* Carousel Styles */
+.carousel-inner img {
+    border-radius: 10px; /* Rounded corners for carousel images */
+    width: 100%; /* Make carousel images responsive */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Category Section */
+h2 {
+    margin-top: 20px; /* Space above headings */
+    font-size: 1.5rem; /* Font size for headings */
+    color: #333; /* Dark color for text */
+}
+
+/* Promo Section */
+.promo-section {
+    background-color: #f8f9fa; /* Light background */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding inside the box */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 100%; /* Allow the section to take full width */
+    overflow: hidden; /* Prevent overflow */
+}
+
+.promo-section img {
+    width: 100%; /* Make images responsive */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 500px; /* Set a maximum height for images */
+    object-fit: cover; /* Cover the area while maintaining aspect ratio */
+    border-radius: 5px; /* Rounded corners for images */
+}
+
+
+/* Promo Item Styles */
+.promo-item {
+    text-align: center; /* Center text */
+    margin-bottom: 15px; /* Space below each promo item */
+}
+
+.promo-item img {
+    border-radius: 5px; /* Rounded corners for promo images */
+    transition: transform 0.3s; /* Smooth transition for hover effect */
+    max-width: 80%; /* Set a maximum width to make images smaller */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 auto; /* Center the image */
+}
+
+/* Custom Image Size Classes */
+.img-small {
+    width: 50px; /* Small image size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.img-medium {
+    width: 100px; /* Medium image size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.img-large {
+    width: 200px; /* Large image size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.promo-item img:hover {
+    transform: scale(1.05); /* Scale up on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .promo-item {
+        flex: 1 1 100%; /* Full width on smaller screens */
+    }
+}
+
+.row {
+    display: flex; /* Use flexbox for the row */
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: space-between; /* Space between items */
+}
+
+/* Adjusting the promo item width */
+.col-md-2 {
+    flex: 1 1 20%; /* Set width for promo items */
+    max-width: 20%; /* Max width for promo items */
+}
+
+@media (max-width: 768px) {
+    .col-md-2 {
+        flex: 1 1 45%; /* Adjust width for smaller screens */
+        max-width: 45%; /* Max width for smaller screens */
+    }
+}
+
+/* Footer Styles */
+footer {
+    background-color: #008FD5; /* Footer background color */
+    color: white; /* Text color */
+    padding: 40px 0; /* Padding for the footer */
+}
+
+/* Footer Menu Styles */
+.footer-menu {
+    padding: 20px; /* Padding around the menu */
+    border-radius: 10px; /* Rounded corners */
+    margin-bottom: 20px; /* Space below the footer menu */
+}
+
+.footer-menu img {
+    width: 150px; /* Logo size */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Widget Title Styles */
+.widget-title {
+    font-size: 1.5rem; /* Larger font size for the title */
+    margin-bottom: 15px; /* Space below the title */
+    font-weight: bold; /* Bold text */
+    color: #333; /* Dark text color */
+}
+
+/* Menu List Styles */
+.menu-list {
+    padding: 0; /* Remove padding */
+}
+
+/* Menu Item Styles */
+.menu-item {
+    margin-bottom: 10px; /* Space between menu items */
+}
+
+/* Nav Link Styles */
+.nav-link {
+    color: white; /* Link color */
+    text-decoration: none; /* Remove underline */
+    transition: color 0.3s; /* Smooth color transition */
+}
+
+.nav-link:hover {
+    color: #ff4081; /* Change color on hover */
+}
+
+/* Social Links Styles */
+.social-links {
+    margin-top: 15px; /* Space above social links */
+}
+
+.social-links ul {
+    padding: 0; /* Remove padding */
+}
+
+.social-links li {
+    list-style: none; /* Remove bullet points */
+}
+
+/* Button Styles */
+.btn-outline-light {
+    border: 1px solid white; /* White border for social buttons */
+    color: white; /* Text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.btn-outline-light:hover {
+    background-color: white; /* Background color on hover */
+    color: #008FD5; /* Text color on hover */
+}
+
+/* Subscribe Section Styles */
+.subscribe-form {
+    display: flex; /* Flexbox for input and button */
+    justify-content: space-between; /* Space between input and button */
+}
+
+.footer-menu p {
+    margin: 10px 0; /* Space above and below the paragraph */
+}
+
+/* Input Field Styles */
+
+.input-group {
+    display: flex; /* Flexbox for input and button */
+    width: 100%; /* Full width */
+}
+
+.form-control {
+    border: 1px solid #ccc; /* Border for input */
+    border-radius: 5px 0 0 5px; /* Rounded corners for input */
+    padding: 10px; /* Padding for input */
+    flex: 1; /* Take available space */
+}
+
+/* Copyright Text Styles */
+.Copyright2023PtDoogoIndonesiaAllRightsReserved {
+    font-size: 14px; /* Font size for copyright */
+    margin: 0; /* Remove default margin */
+    text-align: center; /* Center the text */
+}
+
+/* Dropdown Menu Styles */
+.dropdown-menu {
+    background-color: #ffffff; /* Background color for the dropdown */
+    border: 1px solid #ccc; /* Border for the dropdown */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    z-index: 1000; /* Ensure dropdown appears above other elements */
+}
+
+/* Dropdown Item Styles */
+.dropdown-item {
+    color: #333; /* Text color for dropdown items */
+    padding: 10px 15px; /* Padding for dropdown items */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+/* Hover Effect for Dropdown Items */
+.dropdown-item:hover {
+    background-color: #f8f9fa; /* Light background on hover */
+    color: #008FD5; /* Change text color on hover */
+}
+
+/* Divider Styles */
+.dropdown-divider {
+    height: 1px; /* Height of the divider */
+    margin: 0.5rem 0; /* Space around the divider */
+    background-color: #e9ecef; /* Color of the divider */
+}
+
+/* Responsive Dropdown */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        position: static; /* Make dropdown static on smaller screens */
+        float: none; /* Remove float */
+        width: 100%; /* Full width on smaller screens */
+    }
+}

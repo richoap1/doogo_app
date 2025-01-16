@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Receipt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            position: absolute;
+            align-items: center;
+            background-color: #fff;
+            max-width: 600px;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .content h2 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        .content p {
+            text-align: center;
+        }
+        .content hr {
+            border: 1px solid #ddd;
+        }
+        .content h3 {
+            margin-top: 20px;
+        }
+        .content ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .content ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .qr-code {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='public/images/logo.png') }}" alt="Doogo Logo">
+        </div>
+        <div class="content">
+            <h2>Order Receipt</h2>
+            <p>Thank you for your purchase, {{ first_name }} {{ last_name }}!</p>
+            <hr>
+            <h3>Transaction Details</h3>
+            <p><strong>Invoice Number:</strong> IVR/{{ order_id }}/2025</p>
+            <p><strong>Transaction Date:</strong> {{ transaction_date }}</p>
+            <p><strong>Reference Number:</strong> {{ order_id }}</p>
+            <p><strong>Customer Number:</strong> {{ phone_number }}</p>
+            <p><strong>Name:</strong> {{ first_name }} {{ last_name }}</p>
+            <hr>
+            <h3>Order Details</h3>
+            <ul>
+                {% for product in products %}
+                <li>{{ product.title }} - Quantity: {{ product.quantity }}</li>
+                {% endfor %}
+            </ul>
+            <hr>
+            <p><strong>Total Amount:</strong> Rp{{ grand_total_plus_shipping }}</p>
+            <p><strong>Shipping Address:</strong> {{ address }}, {{ city }}, {{ state }}, {{ country }}</p>
+            <p><strong>Payment Type:</strong> {{ payment_type }}</p>
+            {% if payment_type == 'Bank Transfer' %}
+            <hr>
+            <h3>Bank Transfer Details</h3>
+            <p>Please transfer the total amount to the following bank account:</p>
+            <p><strong>Bank Name:</strong> BCA</p>
+            <p><strong>Account Number:</strong> 5060354202</p>
+            <p><strong>Account Name:</strong> RICHO ANDIKA PUTRA</p>
+            {% endif %}
+            {% if payment_type == 'QR Code' %}
+            <div class="qr-code">
+                <h3>Scan to Pay</h3>
+                <img src="data:image/png;base64,{{ qr_code_image }}" alt="QR Code">
+            </div>
+            {% endif %}
+            <hr>
+            <p>If you have any questions, please contact our customer service.</p>
+            <p>Thank you for shopping with Doogo!</p>
+        </div>
+    </div>
+</body>
+</html>

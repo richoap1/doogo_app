@@ -1,0 +1,184 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light background for the form pages */
+}
+
+/* Form Container */
+.container.mt-5 {
+    max-width: 500px; /* Max width for the form */
+    margin: auto; /* Center the form and add top margin */
+    padding: 20px; /* Padding for the form */
+    background: #fff; /* White background for the form */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    text-align: center; /* Center text inside the form */
+    margin-bottom: 50px; /* Add bottom margin */
+}
+
+/* Form Container */
+.login-form {
+    background: #fff; /* White background for the form */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* Increase max width for the form */
+    margin: auto; /* Center the form */
+    text-align: center; /* Center text inside the form */
+    display: flex;
+    margin: 15px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-form input {
+    width: 100%;
+    max-width: 500px; /* Increase max width for the input fields */
+    margin-bottom: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center; /* Center text inside the input */
+}
+
+.login-form button {
+    width: 100%;
+    max-width: 700px; /* Ensure button width matches input fields */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+    margin-top: 15px; /* Add margin to separate from input */
+}
+
+
+/* Form Headings */
+h2 {
+    color: #333; /* Dark color for headings */
+    text-align: center; /* Center the heading */
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+/* Form Labels */
+label {
+    display: block;
+}
+
+p {
+    text-align: center;
+}
+/* Social Button Styles */
+.social-btn {
+    width: 100%;    
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-btn img {
+    margin-right: 8px; /* Space between icon and text */
+}
+
+/* Form Inputs */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="file"] {
+    width: 100%; /* Full width for inputs */
+    padding: 10px;
+    margin-bottom: 15px; /* Space below inputs */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Submit Button */
+input[type="submit"] {
+    background-color: #008FD5; /* Button color */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding for button */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    width: 100%; /* Full width for button */
+}
+
+input[type="submit"]:hover {
+    background-color: #007bb5; /* Darker shade on hover */
+}
+
+/* Error Messages */
+.error {
+    color: red; /* Red color for error messages */
+    font-size: 0.9em; /* Smaller font size for error messages */
+    margin-top: -10px; /* Space above error messages */
+    margin-bottom: 10px; /* Space below error messages */
+}
+
+/* Search Form Styles */
+.search-form {
+    position: relative; /* Set position to relative for absolute positioning of suggestions */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center the form horizontally */
+    margin: 20px 0; /* Add some margin above and below the form */
+}
+
+.search-form input[type="search"] {
+    width: 600px; /* Increased width for the search input */
+    height: 50px; /* Set height for the input */
+    padding: 10px; /* Add padding for better spacing */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size for the input text */
+    transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.search-form input[type="search"]:focus {
+    border-color: #008FD5; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+.search-form button {
+    padding: 10px 15px; /* Add padding for the button */
+    margin-left: 10px; /* Space between input and button */
+    background-color: #252525; /* Green background color for the button */
+    color: white; /* Button text color */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size for the button text */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.search-form button:hover {
+    background-color: #999999; /* Darker grey shade on hover */
+}
+
+/* Suggestions Dropdown Styles */
+.suggestions-dropdown {
+    position: absolute; /* Position it below the input */
+    top: 100%; /* Align it directly below the input */
+    left: 0; /* Align it to the left of the input */
+    background-color: white; /* Background color */
+    border: 1px solid #ccc; /* Border */
+    color: #333; /* Text color */
+    border-radius: 5px; /* Rounded corners */
+    width: 400px; /* Match the input width */
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Scroll if too many suggestions */
+    z-index: 1000; /* Ensure it appears above other elements */
+    display: none; /* Initially hidden */
+}
+
+.suggestion-item {
+    padding: 10px; /* Padding for each suggestion */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}

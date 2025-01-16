@@ -1,0 +1,147 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+.order-summary-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 80px; /* Adjust the value as needed */
+}
+
+.order-summary-title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.order-summary-custom {
+    width: 100%; /* Ensure it takes the full width */
+    max-width: 400px; /* Adjust the value as needed */
+    text-align: center;
+}
+
+.cart-items {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item {
+    border-bottom: 1px solid #e9ecef;
+    padding: 10px 0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item .item-details {
+    display: flex;
+    align-items: center;
+}
+
+.cart-item .item-details img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.cart-item .item-details h5 {
+    margin: 50px;
+    font-size: 18px;
+}
+
+.cart-item .item-details p {
+    margin: 5px 0 0;
+    color: #6c757d;
+}
+
+.cart-item .item-price {
+    text-align: right;
+}
+
+.cart-item .item-price p {
+    margin: 0;
+    font-size: 16px;
+    color: #343a40;
+}
+
+.order-summary {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.order-summary img {
+    width: 100px;
+    margin-bottom: 20px;
+}
+
+.order-summary h4 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #343a40;
+}
+
+.order-summary .btn-primary {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+}
+
+.recommended-products {
+    margin-top: 40px;
+}
+
+.recommended-products h2 {
+    margin-bottom: 20px;
+}
+
+.recommended-product {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.recommended-product img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.recommended-product h5 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #343a40;
+}
+
+.recommended-product p {
+    margin: 0 0 10px;
+    color: #6c757d;
+}
+
+.recommended-product .btn-secondary {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
