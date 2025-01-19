@@ -14,6 +14,10 @@ from datetime import datetime
 import qrcode  # Import qrcode library
 import io
 import base64
+import locale
+
+# Set locale to Indonesian
+locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
 
 # Configure logging  
 logging.basicConfig(level=logging.DEBUG)  
@@ -72,6 +76,24 @@ def is_valid_email(email):
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'  
     return re.match(email_regex, email) is not None  
 
+def create_reviews_table():  
+    conn = get_db_connection()  
+    conn.execute('''  
+        CREATE TABLE IF NOT EXISTS reviews (  
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  
+            product_id INTEGER NOT NULL,  
+            user_id INTEGER NOT NULL,  
+            rating INTEGER NOT NULL,  
+            comment TEXT,  
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+            FOREIGN KEY (product_id) REFERENCES products (id),  
+            FOREIGN KEY (user_id) REFERENCES users (id)  
+        )  
+    ''')  
+    conn.commit()  
+    conn.close()  
+
+
 def send_registration_email(user_email, user_name):    
     """Send a welcome email to the user after registration."""    
     msg = Message("Welcome to Our Service!", recipients=[user_email])    
@@ -114,29 +136,59 @@ def create_products_table():
             id INTEGER PRIMARY KEY AUTOINCREMENT,  
             title TEXT NOT NULL,  
             description TEXT,  
-            price REAL NOT NULL,  
-            discount REAL DEFAULT 0,  
+            price REAL NOT NULL,
             image_path TEXT,  
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
         )  
     ''')  
     conn.commit()  
     conn.close()  
+    
+def drop_messages_table():  
+    with get_db_connection() as conn:  
+        conn.execute("DROP TABLE IF EXISTS messages") 
 
-# Function to create the messages table  
 def create_messages_table():  
+    with get_db_connection() as conn:  
+        conn.execute("""  
+            CREATE TABLE IF NOT EXISTS messages (  
+                id INTEGER PRIMARY KEY AUTOINCREMENT,  
+                email TEXT NOT NULL,  
+                content TEXT NOT NULL,  
+                response TEXT,  
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+                FOREIGN KEY (email) REFERENCES users(email)  
+            )  
+        """)
+    conn.commit()  
+    conn.close()
+    
+def test_db_connection():  
+    try:  
+        with get_db_connection() as conn:  
+            result = conn.execute("SELECT * FROM messages").fetchall()  
+            print("Database connection successful. Messages:", result)  
+    except Exception as e:  
+        print("Database connection failed:", e)  
+
+# Call this function once to test the connection  
+test_db_connection()  
+
+
+    # Function to create the store_products table  
+def create_store_products_table():  
     conn = get_db_connection()  
     conn.execute('''  
-        CREATE TABLE IF NOT EXISTS messages (  
-            id INTEGER PRIMARY KEY AUTOINCREMENT,  
-            email TEXT NOT NULL,  -- Change from user_id to email  
-            content TEXT NOT NULL,  
-            response TEXT,  
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
+        CREATE TABLE IF NOT EXISTS store_products (  
+            store_id INTEGER NOT NULL,  
+            product_id INTEGER NOT NULL,  
+            PRIMARY KEY(store_id, product_id),  
+            FOREIGN KEY(store_id) REFERENCES stores(id) ON DELETE CASCADE ON UPDATE CASCADE,  
+            FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE ON UPDATE CASCADE  
         )  
     ''')  
     conn.commit()  
-    conn.close()  
+    conn.close()
 
 # Decorator to restrict admin access based on IP  
 def restrict_admin_access(f):  
@@ -190,6 +242,39 @@ def add_stock_column():
     conn.commit()
     conn.close()
     
+def product_detail(product_id):      
+    product = get_product_details(product_id)      
+    print(f"Fetching product details for ID: {product_id}")  # Debugging line  
+    print(f"Product details: {product}")  # Debugging line  
+    if not product:      
+        flash("Product not found.")      
+        return redirect(url_for('products'))      
+
+def get_product_details(product_id):    
+    conn = get_db_connection()    
+    product = conn.execute('''    
+        SELECT p.*, s.name as store_name, s.image_path as store_logo, s.rating as store_rating    
+        FROM products p    
+        JOIN stores s ON p.store_id = s.id    
+        WHERE p.id = ?    
+    ''', (product_id,)).fetchone()    
+    conn.close()    
+    print(f"Product details for ID {product_id}: {product}")  # Debugging line  
+    return product    
+
+def get_reviews(product_id):    
+    conn = get_db_connection()    
+    reviews = conn.execute('''    
+        SELECT r.*, u.name as user_name, u.image_path as user_profile_image    
+        FROM reviews r    
+        JOIN users u ON r.user_id = u.id    
+        WHERE r.product_id = ?    
+    ''', (product_id,)).fetchall()    
+    conn.close()    
+    print(f"Reviews for product ID {product_id}: {reviews}")  # Debugging line  
+    return reviews   
+
+    
 @app.before_request  
 @restrict_admin_access  
 def before_request():  
@@ -200,13 +285,8 @@ def format_price(price):
     """Format the price to include 'Rp' and use thousands separators."""  
     return f"Rp{int(price):,}".replace(',', '.')  
 
-def format_discount(discount):  
-    """Format the discount to remove decimal places if it's a whole number."""  
-    return int(discount) if discount.is_integer() else discount  
-
 # Register helper functions in Jinja2  
-app.jinja_env.globals.update(format_price=format_price)  
-app.jinja_env.globals.update(format_discount=format_discount)  
+app.jinja_env.globals.update(format_price=format_price)
 
 @app.route('/')  
 def index():  
@@ -216,10 +296,16 @@ def index():
 def about():  
     return render_template('about.ejs')  
 
-@app.route('/homepage')  
-def homepage():  
-    print("User ID in session:", session.get('user_id'))  # Debugging line  
-    return render_template('homepage.ejs')  
+@app.route('/homepage')
+def homepage():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
+    conn.close()
+    return render_template('homepage.ejs', store=store)
 
 @app.route('/layanan')  
 def layanan():  
@@ -227,12 +313,13 @@ def layanan():
 
 @app.route('/products', methods=['GET', 'POST'])  
 def products():  
+    user_id = session.get('user_id')  
     conn = get_db_connection()  
-    
+
     if request.method == 'POST':  
         product_id = request.form.get('product_id')  
         quantity = request.form.get('quantity', '1')  # Default to '1' if not specified  
-        
+
         # Convert product_id and quantity to integers  
         try:  
             product_id = int(product_id)  
@@ -240,30 +327,82 @@ def products():
         except ValueError:  
             flash("Invalid product ID or quantity.")  
             return redirect(url_for('products'))  
-        
+
         # Initialize cart in session if it doesn't exist  
         if 'cart' not in session:  
             session['cart'] = {}  
-        
-        # Add product to cart  
+
+    # Add product to cart  
         if product_id in session['cart']:  
             session['cart'][product_id] += quantity  # Increment quantity if already in cart  
         else:  
             session['cart'][product_id] = quantity  # Add new product to cart  
-        
+
         session.modified = True  # Mark session as modified  
         flash("Product added to cart!")  # Flash message for user feedback  
+
         return redirect(url_for('products'))  
 
+    # Handle GET request to display products  
     products = conn.execute("SELECT * FROM products").fetchall()  
-    conn.close()  
-    
-    return render_template('products.php', products=products)  # Ensure this points to your products template  
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()  
 
+    # Format prices  
+    formatted_products = []  
+    for product in products:  
+        formatted_product = dict(product)  
+        formatted_product['price'] = locale.currency(product['price'], grouping=True)  
+        formatted_products.append(formatted_product)  
+
+    conn.close()  
+
+    return render_template('products.php', products=formatted_products, store=store)  # Ensure this points to your products template  
+
+@app.route('/product/<int:product_id>', methods=['GET', 'POST'])  
+def product_detail(product_id):  
+    product = get_product_details(product_id)  
+    if not product:  
+        flash("Product not found.")  
+        return redirect(url_for('products'))  
+
+    reviews = get_reviews(product_id)  
+
+    # Format price  
+    product['price'] = locale.currency(product['price'], grouping=True)  
+
+    if request.method == 'POST':  
+        user_id = session.get('user_id')  
+        if not user_id:  
+            flash("You need to be logged in to add a review.")  
+            return redirect(url_for('login'))  
+
+        conn = get_db_connection()  
+        user = conn.execute('SELECT name FROM users WHERE id = ?', (user_id,)).fetchone()  
+        user_name = user['name'] if user else 'Anonymous'  
+
+        rating = request.form.get('rating')  
+        comment = request.form.get('comment')  
+        store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()  
+
+        # Add review to database  
+        conn.execute('''  
+            INSERT INTO reviews (product_id, user_id, user_name, rating, comment)  
+            VALUES (?, ?, ?, ?, ?)  
+        ''', (product_id, user_id, user_name, rating, comment))  
+        conn.commit()  
+        conn.close()  
+
+        flash("Review added successfully!")  
+        return redirect(url_for('product_detail', product_id=product_id))  
+
+    return render_template('detail_products.php', product=product, reviews=reviews, store=store) 
 @app.route('/cart')
 def cart():
+    user_id = session.get('user_id')  
+    conn = get_db_connection()
     products, grand_total, grand_total_plus_shipping, quantity_total = handle_cart()
-    return render_template('cart.php', products=products, grand_total=grand_total, grand_total_plus_shipping=grand_total_plus_shipping, quantity_total=quantity_total)
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
+    return render_template('cart.php', products=products, grand_total=grand_total, grand_total_plus_shipping=grand_total_plus_shipping, quantity_total=quantity_total, store=store)
 
 @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
 def add_to_cart(product_id):
@@ -319,67 +458,115 @@ def remove_from_cart(product_id):
     flash('Product removed from cart!')
     return jsonify(success=True)
 
-@app.route('/checkout', methods=['GET', 'POST'])
-@login_required
-def checkout():
-    products, grand_total, grand_total_plus_shipping, quantity_total = handle_cart()
+@app.route('/checkout', methods=['GET', 'POST'])    
+@login_required    
+def checkout():    
+    products, grand_total, grand_total_plus_shipping, quantity_total = handle_cart()    
 
-    if request.method == 'POST':
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        phone_number = request.form['phone_number']
-        email = request.form['email']
-        address = request.form['address']
-        city = request.form['city']
-        state = request.form['state']
-        country = request.form['country']
-        payment_type = request.form['payment_type']
+    if request.method == 'POST':    
+        first_name = request.form['first_name']    
+        last_name = request.form['last_name']    
+        phone_number = request.form['phone_number']    
+        email = request.form['email']    
+        address = request.form['address']    
+        city = request.form['city']    
+        state = request.form['state']    
+        country = request.form['country']    
+        payment_type = request.form['payment_type']    
 
-        with get_db_connection() as conn:
-            conn.execute("INSERT INTO orders (first_name, last_name, phone_number, email, address, city, state, country, payment_type, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        (first_name, last_name, phone_number, email, address, city, state, country, payment_type, 'PENDING'))
-            order_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+        with get_db_connection() as conn:    
+            # Insert the order  
+            conn.execute("INSERT INTO orders (first_name, last_name, phone_number, email, address, city, state, country, payment_type, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",    
+                        (first_name, last_name, phone_number, email, address, city, state, country, payment_type, 'PENDING'))    
+            order_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]    
 
-            for product in products:
-                conn.execute("INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",
-                            (order_id, product['id'], product['quantity']))
-                conn.execute("UPDATE products SET stock = stock - ? WHERE id = ?",
-                            (product['quantity'], product['id']))
+            for product in products:    
+                # Insert order items  
+                conn.execute("INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)",    
+                            (order_id, product['id'], product['quantity']))    
+                # Update product stock  
+                conn.execute("UPDATE products SET stock = stock - ? WHERE id = ?",    
+                            (product['quantity'], product['id']))    
 
-            conn.commit()
+                # Create a notification for the seller  
+                seller_id = conn.execute("SELECT store_id FROM products WHERE id = ?", (product['id'],)).fetchone()['store_id']  
+                conn.execute("INSERT INTO order_notifications (order_id, seller_id, message) VALUES (?, ?, ?)",   
+                            (order_id, seller_id, f"Your product '{product['title']}' has been ordered."))  
 
-        qr_code_image = None
-        if payment_type == 'QR Code':
-            # Generate QR code
-            qr_data = f"Order ID: {order_id}\nTotal Amount: Rp{grand_total_plus_shipping}\nPayment Type: {payment_type}"
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(qr_data)
-            qr.make(fit=True)
-            img = qr.make_image(fill='black', back_color='white')
+            conn.commit()    
 
-            # Save QR code to a bytes buffer
-            buffer = io.BytesIO()
-            img.save(buffer, format="PNG")
-            qr_code_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        qr_code_image = None  
+        if payment_type == 'QR Code':  
+            # Generate QR code  
+            qr_data = f"Order ID: {order_id}\nTotal Amount: Rp{grand_total_plus_shipping}\nPayment Type: {payment_type}"  
+            qr = qrcode.QRCode(  
+                version=1,  
+                error_correction=qrcode.constants.ERROR_CORRECT_L,  
+                box_size=10,  
+                border=4,  
+            )  
+            qr.add_data(qr_data)  
+            qr.make(fit=True)  
+            img = qr.make_image(fill='black', back_color='white')  
 
-        # Generate receipt content
-        receipt_content = render_template('receipt.ejs', first_name=first_name, last_name=last_name, order_id=order_id, transaction_date=datetime.now().strftime('%d %b %Y %H:%M'), phone_number=phone_number, products=products, grand_total_plus_shipping=grand_total_plus_shipping, address=address, city=city, state=state, country=country, payment_type=payment_type, qr_code_image=qr_code_image)
+            # Save QR code to a bytes buffer  
+            buffer = io.BytesIO()  
+            img.save(buffer, format="PNG")  
+            qr_code_image = base64.b64encode(buffer.getvalue()).decode('utf-8')  
 
-        # Send receipt email
-        send_receipt_email(email, receipt_content)
+        # Generate receipt content  
+        receipt_content = render_template('receipt.ejs', first_name=first_name, last_name=last_name, order_id=order_id, transaction_date=datetime.now().strftime('%d %b %Y %H:%M'), phone_number=phone_number, products=products, grand_total_plus_shipping=grand_total_plus_shipping, address=address, city=city, state=state, country=country, payment_type=payment_type, qr_code_image=qr_code_image)  
 
-        session['cart'] = []
-        session.modified = True
+        # Send receipt email  
+        send_receipt_email(email, receipt_content)  
 
-        flash('Order placed successfully! A receipt has been sent to your email.', 'success')
-        return redirect(url_for('homepage'))
+        session['cart'] = []    
+        session.modified = True    
 
-    return render_template('checkout.php', products=products, grand_total=grand_total, grand_total_plus_shipping=grand_total_plus_shipping, quantity_total=quantity_total)
+        flash('Order placed successfully! A receipt has been sent to your email.', 'success')    
+        return redirect(url_for('products'))    
+
+    return render_template('checkout.php', products=products, grand_total=grand_total, grand_total_plus_shipping=grand_total_plus_shipping, quantity_total=quantity_total)    
+
+@app.route('/notifications')    
+@login_required    
+def notifications():    
+    user_id = session.get('user_id')    
+    if not user_id:    
+        return redirect(url_for('login'))    
+
+    with get_db_connection() as conn:    
+        # Fetch notifications for the logged-in seller  
+        notifications = conn.execute("SELECT * FROM order_notifications WHERE seller_id = ? ORDER BY created_at DESC", (user_id,)).fetchall()    
+
+    return render_template('notifications.php', notifications=notifications)    
+
+@app.route('/update_order_status/<int:order_id>', methods=['POST'])    
+@login_required    
+def update_order_status(order_id):    
+    user_id = session.get('user_id')    
+    if not user_id:    
+        return redirect(url_for('login'))    
+
+    new_status = request.form['status']  # Get the new status from the form    
+
+    with get_db_connection() as conn:    
+        # Check if the user is the seller of the products in the order    
+        products = conn.execute("SELECT product_id FROM order_items WHERE order_id = ?", (order_id,)).fetchall()    
+        product_ids = [product['product_id'] for product in products]    
+
+        # Check if the seller owns any of the products    
+        store_id = conn.execute("SELECT store_id FROM products WHERE id IN ({})".format(','.join('?' * len(product_ids))), product_ids).fetchone()    
+        
+        if store_id and store_id['store_id'] == conn.execute("SELECT store_id FROM stores WHERE owner_id = ?", (user_id,)).fetchone()['store_id']:  
+            # Update the order status if the seller owns the products  
+            conn.execute("UPDATE orders SET status = ? WHERE id = ?", (new_status, order_id))    
+            conn.commit()    
+            flash("Order status updated successfully!")    
+        else:    
+            flash("You are not authorized to update this order status.")    
+
+    return redirect(url_for('notifications'))  # Redirect to notifications page  
 
 # Register route  
 @app.route('/register', methods=['GET', 'POST'])    
@@ -418,26 +605,33 @@ def register():
 
     return render_template('register.php')    
 
-@app.route('/login', methods=['GET', 'POST'])  
-def login():  
-    if request.method == 'POST':  
-        email = request.form['username']  # Change from username to email  
-        password = request.form['password']  
+@app.route('/login', methods=['GET', 'POST'])    
+def login():    
+    if request.method == 'POST':    
+        email = request.form['username']  # Change from username to email    
+        password = request.form['password']    
 
-        # Check if the user exists  
-        with get_db_connection() as conn:  
-            user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()  
+        # Check if the user exists    
+        with get_db_connection() as conn:    
+            user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()    
 
-        if user and check_password_hash(user['password'], password):  
-            # Store user information in session  
-            session['user_id'] = user['id']  
-            session['name'] = user['name']  # Store the user's name  
-            session['role'] = user['role']  # Store the user's role  
-            flash("Login successful!")  
-            return redirect(url_for('homepage'))  # Redirect to the homepage after successful login  
-        else:  
-            flash("Invalid email or password.")  
-            return redirect(url_for('login'))  
+        if user and check_password_hash(user['password'], password):    
+            # Store user information in session    
+            session['user_id'] = user['id']    
+            session['name'] = user['name']  # Store the user's name    
+            session['email'] = user['email']  # Store the user's email for later use  
+            session['role'] = user['role']  # Store the user's role    
+
+            # Fetch and store the store name if the user has a store  
+            store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user['id'],)).fetchone()  
+            if store:  
+                session['store_name'] = store['name']  
+
+            flash("Login successful!")    
+            return redirect(url_for('homepage'))  # Redirect to the homepage after successful login    
+        else:    
+            flash("Invalid email or password.")    
+            return redirect(url_for('login'))    
 
     return render_template('login.php')  
 
@@ -545,32 +739,39 @@ def admin_login():
 
     return render_template('admin_login.php')  # Render the admin login page  
 
-@app.route('/bantuan', methods=['GET', 'POST'])
-@login_required
-def bantuan():
-    if request.method == 'POST':
-        user_message = request.form['user_message']
-        # Store user message in the database
-        with get_db_connection() as conn:
-            conn.execute("INSERT INTO messages (content, email) VALUES (?, ?)", (user_message, session.get('email')))  # Use email instead of user_id
-            conn.commit()
-        flash("Message sent successfully!")
-        return redirect(url_for('bantuan'))
+@app.route('/bantuan', methods=['GET', 'POST'])    
+@login_required    
+def bantuan():    
+    if request.method == 'POST':    
+        user_message = request.form['user_message']    
+        user_email = session.get('email')  # Get email from session    
+            
+        if user_email is None:    
+            flash("Error: User email not found in session.")    
+            return redirect(url_for('bantuan'))    
 
-    # Fetch messages and responses for the logged-in user
-    with get_db_connection() as conn:
-        messages = conn.execute("SELECT * FROM messages WHERE email = ?", (session.get('email'),)).fetchall()  # Use email instead of user_id
+        # Store user message in the database    
+        with get_db_connection() as conn:    
+            conn.execute("INSERT INTO messages (content, email) VALUES (?, ?)", (user_message, user_email))    
+            conn.commit()    
+        flash("Message sent successfully!")    
+        return redirect(url_for('bantuan'))    
 
-    return render_template('bantuan.ejs', messages=messages)
+    # Fetch messages and responses for the logged-in user    
+    with get_db_connection() as conn:    
+        messages = conn.execute("SELECT * FROM messages WHERE email = ?", (session.get('email'),)).fetchall()    
 
-@app.route('/admin_page')  
-def admin_page():  
-    # Check if the user is logged in and has the role of admin  
-    if 'user_id' not in session or session.get('role') != 'admin':  
-        flash("You are not authorized to access this page.")  
-        return redirect(url_for('admin_login'))  # Redirect to login if not authorized  
+    return render_template('bantuan.ejs', messages=messages)   
 
-    return render_template('admin_page.php')  # Render the admin page  
+@app.route('/admin_page')    
+@login_required    
+def admin_page():    
+    # Check if the user has the role of admin    
+    if session.get('role') != 'admin':    
+        flash("You are not authorized to access this page.")    
+        return redirect(url_for('admin_login'))  # Redirect to login if not authorized    
+
+    return render_template('admin_page.php')  # Render the admin page    
 
 @app.route('/admin_chat', methods=['GET', 'POST'])  
 def admin_chat():  
@@ -579,13 +780,22 @@ def admin_chat():
         flash("You are not authorized to access this page.")  
         return redirect(url_for('login'))  # Redirect to login if not authorized  
 
-    with get_db_connection() as conn:  
-        # Fetch all users to display in the dropdown  
-        users = conn.execute("SELECT id, email FROM users WHERE role = 'user'").fetchall()  # Change from username to email  
-        
-        messages = conn.execute("SELECT * FROM messages").fetchall()  # Fetch all messages  
+    selected_user_id = None  
+    messages = []  
 
-    return render_template('admin_chat.php', messages=messages, users=users)  
+    if request.method == 'POST':  
+        selected_user_id = request.form.get('user_id')  # Get the selected user ID from the form  
+
+        if selected_user_id:  
+            # Fetch messages for the selected user  
+            with get_db_connection() as conn:  
+                messages = conn.execute("SELECT * FROM messages WHERE email = (SELECT email FROM users WHERE id = ?)", (selected_user_id,)).fetchall()  
+
+    # Fetch all users to display in the dropdown, including sellers and admins  
+    with get_db_connection() as conn:  
+        users = conn.execute("SELECT id, email, role FROM users WHERE role IN ('user', 'seller', 'admin')").fetchall()  # Fetch users with roles 'user', 'seller', and 'admin'  
+
+    return render_template('admin_chat.php', messages=messages, users=users, selected_user_id=selected_user_id)  
 
 @app.route('/reply_chat/<int:message_id>', methods=['POST'])  
 def reply_chat(message_id):  
@@ -597,16 +807,126 @@ def reply_chat(message_id):
         conn.commit()  
 
     flash("Response sent successfully!")  
-    return redirect(url_for('admin_chat'))  # Redirect back to the admin chat page  
+    return redirect(url_for('admin_chat'))  # Redirect back to the admin chat page    
 
-@app.route('/seller')  
+@app.route('/seller', methods=['GET', 'POST'])  
 def seller():  
-    # Check if the user is logged in and has the role of seller or admin  
     if 'user_id' not in session or session.get('role') not in ['seller', 'admin']:  
         flash("You are not authorized to access this page.")  
-        return redirect(url_for('login'))  # Redirect to login if not authorized  
+        return redirect(url_for('login'))  
 
-    return render_template('seller.php')  
+    user_id = session.get('user_id')  
+    conn = get_db_connection()  
+    categories = conn.execute('SELECT * FROM categories').fetchall()  
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()  
+
+    if request.method == 'POST':  
+        title = request.form['title']  
+        description = request.form['description']  
+        price = request.form['price']  
+        stock = request.form['stock']  
+        category_id = request.form['category_id']  
+        image = request.files['image']  # Assuming image_path is provided  
+
+        # Insert new product into products table  
+        conn.execute('''  
+            INSERT INTO products (title, description, price, stock, category_id, image_path)  
+            VALUES (?, ?, ?, ?, ?, ?)  
+        ''', (title, description, price, stock, category_id, image.filename))  
+
+        # Get the last inserted product id  
+        product_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]  
+
+        # Insert into store_products table  
+        conn.execute('''  
+            INSERT INTO store_products (store_id, product_id)  
+            VALUES (?, ?)  
+        ''', (store['id'], product_id))  
+
+        conn.commit()  
+        flash("Product added successfully!")  
+        return redirect(url_for('seller_dashboard'))  
+
+    conn.close()  
+    return render_template('seller.php', categories=categories, store=store)  
+
+
+@app.route('/seller_dashboard')      
+def seller_dashboard():      
+    user_id = session.get('user_id')      
+    if not user_id:      
+        return redirect(url_for('login'))      
+
+    conn = get_db_connection()      
+    # Get the store associated with the logged-in user    
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()      
+
+    if store:      
+        # Fetch only the products that belong to the seller's store    
+        products = conn.execute('''      
+            SELECT *      
+            FROM products      
+            WHERE store_id = ?      
+        ''', (store['id'],)).fetchall()      
+
+        # Fetch orders related to the seller's products  
+        orders = conn.execute('''    
+            SELECT o.*, SUM(oi.quantity * p.price) AS total_amount  
+            FROM orders o  
+            JOIN order_items oi ON o.id = oi.order_id  
+            JOIN products p ON oi.product_id = p.id  
+            WHERE p.store_id = ?  
+            GROUP BY o.id  
+        ''', (store['id'],)).fetchall()  
+    else:      
+        products = []    
+        orders = []  
+
+    conn.close()      
+
+    # Format prices      
+    formatted_products = []      
+    for product in products:      
+        formatted_product = dict(product)      
+        formatted_product['price'] = locale.currency(product['price'], grouping=True)      
+        formatted_products.append(formatted_product)      
+
+    return render_template('seller_dashboard.php', store=store, products=formatted_products, orders=orders)  
+
+
+
+
+@app.route('/register_vendor', methods=['GET', 'POST'])
+def register_vendor():
+    if request.method == 'POST':
+        user_id = session.get('user_id')
+        store_name = request.form['store_name']
+        description = request.form['description']
+        location = request.form['location']
+        operational_hours = request.form['operational_hours']
+        image = request.files['image']
+        
+        # Save the image file
+        image_path = os.path.join('static/uploads', image.filename)
+        image.save(image_path)
+        
+        conn = get_db_connection()
+        conn.execute('''
+            INSERT INTO stores (owner_id, name, description, location, operational_hours, image_path)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (user_id, store_name, description, location, operational_hours, image_path))
+        
+        # Update the user's role to 'seller'
+        conn.execute('UPDATE users SET role = ? WHERE id = ?', ('seller', user_id))
+        conn.commit()
+        conn.close()
+        
+        session['store_name'] = store_name
+        session['role'] = 'seller'  # Update the session role to 'seller'
+        flash('Store registered successfully!')
+        return redirect(url_for('seller_dashboard'))
+    
+    return render_template('register_vendor.php')
 
 @app.route('/manage_products')
 def manage_products():
@@ -620,43 +940,53 @@ def edit_product(product_id):
         product = conn.execute('SELECT * FROM products WHERE id = ?', (product_id,)).fetchone()
     return render_template('edit_product.php', product=product)
 
-@app.route('/add_product', methods=['POST'])
-def add_product():
-    title = request.form['title']
-    description = request.form['description']
-    price = request.form['price']
-    discount = request.form['discount']
-    stock = request.form['stock']  # Add stock field
+@app.route('/add_product', methods=['POST'])  
+def add_product():  
+    title = request.form['title']  
+    description = request.form['description']  
+    price = request.form['price']  
+    stock = request.form['stock']  
+    category_id = request.form['category']  # Capture the category ID  
 
-    # Validate image upload
-    if 'image' not in request.files:
-        flash("No image uploaded.")
-        return redirect(url_for('seller'))
+    # Validate image upload  
+    if 'image' not in request.files:  
+        flash("No image uploaded.")  
+        return redirect(url_for('seller'))  
 
-    image = request.files['image']
-    if image.filename == '':
-        flash("No selected file.")
-        return redirect(url_for('seller'))
+    image = request.files['image']  
+    if image.filename == '':  
+        flash("No selected file.")  
+        return redirect(url_for('seller'))  
 
-    # Save the uploaded image
-    image_path = os.path.join('static/public/images', image.filename)
-    image.save(image_path)
+    # Save the uploaded image  
+    image_path = os.path.join('static/public/images', image.filename)  
+    image.save(image_path)  
 
-    # Insert product into the database
-    with get_db_connection() as conn:
-        conn.execute("INSERT INTO products (title, description, price, discount, stock, image_path) VALUES (?, ?, ?, ?, ?, ?)",
-                    (title, description, price, discount, stock, image_path))
-        conn.commit()
+    # Get the store ID for the logged-in seller  
+    user_id = session.get('user_id')  # Get the logged-in user's ID  
+    with get_db_connection() as conn:  
+        store = conn.execute("SELECT id FROM stores WHERE owner_id = ?", (user_id,)).fetchone()  
+        if store:  
+            store_id = store['id']  # Get the store ID  
+        else:  
+            flash("Store not found. Please register your store first.")  
+            return redirect(url_for('seller'))  
 
-    flash("Product added successfully!")
-    return redirect(url_for('products'))  # Redirect to the products page after adding
+    # Insert product into the database  
+    with get_db_connection() as conn:  
+        conn.execute("INSERT INTO products (title, description, price, stock, category_id, store_id, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)",  
+                    (title, description, price, stock, category_id, store_id, image_path))  # Include store_id  
+        conn.commit()  
+
+    flash("Product added successfully!")  
+    return redirect(url_for('products'))  # Redirect to the products page after adding  
+
 
 @app.route('/update_product/<int:product_id>', methods=['POST'])
 def update_product(product_id):
     title = request.form['title']
     description = request.form['description']
     price = request.form['price']
-    discount = request.form['discount']
     stock = request.form['stock']
 
     # Validate image upload
@@ -669,11 +999,11 @@ def update_product(product_id):
     # Update product in the database
     with get_db_connection() as conn:
         if image_path:
-            conn.execute("UPDATE products SET title = ?, description = ?, price = ?, discount = ?, stock = ?, image_path = ? WHERE id = ?",
-                        (title, description, price, discount, stock, image_path, product_id))
+            conn.execute("UPDATE products SET title = ?, description = ?, price = ?, stock = ?, image_path = ? WHERE id = ?",
+                        (title, description, price, stock, image_path, product_id))
         else:
-            conn.execute("UPDATE products SET title = ?, description = ?, price = ?, discount = ?, stock = ? WHERE id = ?",
-                        (title, description, price, discount, stock, product_id))
+            conn.execute("UPDATE products SET title = ?, description = ?, price = ?, stock = ? WHERE id = ?",
+                        (title, description, price, stock, product_id))
         conn.commit()
 
     flash("Product updated successfully!")
@@ -775,7 +1105,8 @@ def suggestions():
 if __name__ == '__main__':  
     create_users_table()  # Create the users table when the app starts  
     create_products_table()  # Create the products table when the app starts  
-    create_messages_table()  # Create the messages table when the app starts  
+    create_messages_table()
+    create_reviews_table()  # Create the reviews table when the app starts  
     try:  
         app.run(host='0.0.0.0', port=5000, debug=True)  # Run on localhost  
     except KeyboardInterrupt:  

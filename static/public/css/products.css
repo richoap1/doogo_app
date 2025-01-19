@@ -2,6 +2,9 @@
 body {
     font-family: 'Nunito', sans-serif;
     background: #E7F4FC; /* Light background for the body */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 /* Centering the h2 heading */
@@ -24,15 +27,16 @@ h2 {
 /* Product Card Styles */
 .product-card {
     border: 1px solid #ddd; /* Light border for product cards */
-    border-radius: 5px; /* Rounded corners */
+    border-radius: 10px; /* Rounded corners */
     padding: 15px; /* Padding inside product cards */
     background-color: #fff; /* White background for product cards */
     text-align: center; /* Center text and images */
-    transition: box-shadow 0.3s; /* Smooth transition for shadow */
+    transition: box-shadow 0.3s, transform 0.3s; /* Smooth transition for shadow and transform */
 }
 
 .product-card:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect on hover */
+    transform: translateY(-5px); /* Slight lift on hover */
 }
 
 /* Product Image Styles */
@@ -40,7 +44,7 @@ h2 {
     width: 100%; /* Make the image responsive */
     height: 200px; /* Fixed height for images */
     object-fit: cover; /* Cover the area without stretching */
-    border-radius: 5px; /* Rounded corners for images */
+    border-radius: 10px; /* Rounded corners for images */
 }
 
 /* Button Area Styles */
@@ -68,6 +72,7 @@ h2 {
 header {
     background-color: #008FD5; /* Custom header background color */
     position: relative; /* Position relative for absolute positioning of cart icon */
+    padding: 10px 0; /* Padding for header */
 }
 
 .logo {
@@ -82,13 +87,13 @@ header {
     color: #ff4081; /* Navbar link hover color */
 }
 
-
+/* Cart Icon Styles */
 .cart-icon {
     position: relative; /* Position relative for badge positioning */
 }
 
 .cart-icon .badge {
-    position: inherit; /* Position absolute for badge */
+    position: absolute; /* Position absolute for badge */
     top: -10px; /* Adjust position */
     right: -10px; /* Adjust position */
     background-color: rgb(32, 129, 12); /* Badge color */

@@ -32,6 +32,11 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
+                        {% if store %}
+                        <a class="dropdown-item" href="/seller_dashboard">Store</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/register_vendor">Register Store</a>
+                        {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Logout</a>
                     </div>
@@ -52,6 +57,16 @@
                     <a class="nav-link Language-EN" href="#EN">
                         <span class="iconify" data-icon="flagpack:gb-nir" style="width: 24px; height: 24px; margin-right: 5px;"></span>
                         EN
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/cart" class="btn btn-dark position-relative cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if session.get('cart') %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ session.get('cart')|length }}
+                        </span>
+                        {% endif %}
                     </a>
                 </div>
             </div>
@@ -75,26 +90,9 @@
                             Categories
                         </a>
                         <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                            <a class="dropdown-item" href="/category/daging">Daging</a>
-                            <a class="dropdown-item" href="/category/sayur">Sayur</a>
-                            <a class="dropdown-item" href="/category/bumbu">Bumbu</a>
-                            <a class="dropdown-item" href="/category/buah">Buah</a>
-                            <a class="dropdown-item" href="/category/minuman">Minuman</a>
-                            <a class="dropdown-item" href="/category/snack">Snack</a>
-                            <a class="dropdown-item" href="/category/roti">Roti</a>
-                            <a class="dropdown-item" href="/category/susu">Susu</a>
-                            <a class="dropdown-item" href="/category/beras">Beras</a>
-                            <a class="dropdown-item" href="/category/makanan-beku">Makanan Beku</a>
-                            <a class="dropdown-item" href="/category/makanan-instan">Makanan Instan</a>
-                            <a class="dropdown-item" href="/category/makanan-sehat">Makanan Sehat</a>
-                            <a class="dropdown-item" href="/category/alat-dapur">Alat Dapur</a>
-                            <a class="dropdown-item" href="/category/perawatan-tubuh">Perawatan Tubuh</a>
-                            <a class="dropdown-item" href="/category/perawatan-rumah">Perawatan Rumah</a>
-                            <a class="dropdown-item" href="/category/elektronik">Elektronik</a>
-                            <a class="dropdown-item" href="/category/fashion">Fashion</a>
-                            <a class="dropdown-item" href="/category/olahraga">Olahraga</a>
-                            <a class="dropdown-item" href="/category/mainan">Mainan</a>
-                            <a class="dropdown-item" href="/category/buku">Buku</a>
+                            {% for category in categories %}
+                            <a class="dropdown-item" href="/category/{{ category['name'] }}">{{ category['name'] }}</a>
+                            {% endfor %}
                         </div>
                     </li>
             </ul>
@@ -102,18 +100,22 @@
     </nav>
 
     <!-- Products List -->
-    <div class="container mt-5">
+    <div class="products container mt-5">
         <div class="row">
             {% for product in products %}
             <div class="col-md-4">
-                <div class="card mb-4">
+                <div class="product-card mb-4">
                     <img src="{{ product['image_path'] }}" class="card-img-top" alt="{{ product['title'] }}">
-                    <div class="card-body">
+                    <div class="product-card-body">
                         <h5 class="card-title">{{ product['title'] }}</h5>
                         <p class="card-text">{{ product['description'] }}</p>
                         <p class="card-text"><strong>Price:</strong> {{ product['price'] }}</p>
                         <p class="card-text"><strong>Stock:</strong> {{ product['stock'] }}</p>
-                        <a href="/product/{{ product['id'] }}" class="btn btn-primary">View Product</a>
+                        <a href="{{ url_for('product_detail', product_id=product['id']) }}" class="btn btn-primary">View Product</a>
+                        <form action="{{ url_for('add_to_cart', product_id=product['id']) }}" method="POST" class="mt-2">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-success">Add to Cart</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -219,5 +221,6 @@
     AOS.init();
 </script>
 <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

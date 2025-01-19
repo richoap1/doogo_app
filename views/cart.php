@@ -32,6 +32,11 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
+                        {% if store %}
+                        <a class="dropdown-item" href="/seller_dashboard">Store</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/register_vendor">Register Store</a>
+                        {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Logout</a>
                     </div>
@@ -48,12 +53,12 @@
                     <a class="nav-link Language-ID" href="#ID">
                         <span class="iconify" data-icon="flagpack:id" style="width: 24px; height: 24px; margin-right: 5px;"></span>
                         ID
-                </a>
+                    </a>
                     <a class="nav-link Language-EN" href="#EN">
                         <span class="iconify" data-icon="flagpack:gb-nir" style="width: 24px; height: 24px; margin-right: 5px;"></span>
                         EN
-                </a>
-        </div>
+                    </a>
+                </div>
     </header>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light mt-3">

@@ -72,47 +72,47 @@
         </div>
     </nav>
 
-<div class="container mt-5">
-    <h2 class="text-center">User Messages</h2>
-    
-    <!-- <form method="POST" class="mb-3">
-        <div class="form-group">
-            <label for="userSelect">Select User:</label>
-            <select class="form-control" id="userSelect" name="user_id" onchange="this.form.submit()">
-                <option value="">-- Select User --</option>
-                {% for user in users %}
-                    <option value="{{ user.id }}" {% if user.id == selected_user_id %}selected{% endif %}>{{ user.email }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </form> -->
+    <div class="container mt-5">  
+    <h2 class="text-center">User Massages</h2>  
 
-    <table class="table" id="messagesTable">
-        <thead>
-            <tr>
-                <th>Email</th>  <!-- Display user's email -->
-                <th>Message</th>
-                <th>Response</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="messagesList">
-            {% for message in messages %}
-            <tr id="message-{{ message.id }}">
-                <td>{{ message.email }}</td>  <!-- Display user's email -->
-                <td>{{ message.content }}</td>
-                <td>{{ message.response }}</td>
-                <td>
-                    <form action="{{ url_for('reply_chat', message_id=message.id) }}" method="POST">
-                        <input type="text" name="response" placeholder="Type your response" required>
-                        <button type="submit" class="btn btn-success">Reply</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <form method="POST" class="mb-3" action="{{ url_for('admin_chat') }}">  
+        <div class="form-group">  
+            <label for="userSelect">Select User:</label>  
+            <select class="form-control" id="userSelect" name="user_id" onchange="this.form.submit()">  
+                <option value="">-- Select User --</option>  
+                {% for user in users %}  
+                    <option value="{{ user.id }}" {% if user.id == selected_user_id %}selected{% endif %}>{{ user.email }} ({{ user.role }})</option>  
+                {% endfor %}  
+            </select>  
+        </div>  
+    </form>  
+
+    <table class="table" id="messagesTable">  
+        <thead>  
+            <tr>  
+                <th>Email</th>  
+                <th>Message</th>  
+                <th>Response</th>  
+                <th>Action</th>  
+            </tr>  
+        </thead>  
+        <tbody id="messagesList">  
+            {% for message in messages %}  
+            <tr id="message-{{ message.id }}">  
+                <td>{{ message.email }}</td>  
+                <td>{{ message.content }}</td>  
+                <td>{{ message.response }}</td>  
+                <td>  
+                    <form action="{{ url_for('reply_chat', message_id=message.id) }}" method="POST">  
+                        <input type="text" name="response" placeholder="Type your response" required>  
+                        <button type="submit" class="btn btn-success">Reply</button>  
+                    </form>  
+                </td>  
+            </tr>  
+            {% endfor %}  
+        </tbody>  
+    </table>  
+</div>  
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

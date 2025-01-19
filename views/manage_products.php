@@ -81,7 +81,6 @@
                             <th>Title</th>
                             <th>Description</th>
                             <th>Price</th>
-                            <th>Discount</th>
                             <th>Stock</th>
                             <th>Image</th>
                             <th>Actions</th>
@@ -93,7 +92,6 @@
                                 <td>{{ product.title }}</td>
                                 <td>{{ product.description }}</td>
                                 <td>{{ product.price }}</td>
-                                <td>{{ product.discount }}%</td>
                                 <td>{{ product.stock }}</td>
                                 <td><img src="{{ product.image_path }}" alt="{{ product.title }}" style="width: 50px; height: auto;"></td>
                                 <td>
