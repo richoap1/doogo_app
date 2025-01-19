@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='public/css/chat.css') }}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='public/css/products.css') }}">
-    <title>Doogo</title>
-</head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='public/css/chat.css') }}">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='public/css/homepage.css') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='public/css/products.css') }}">
+        <title>Doogo</title>
+    </head>
 <body>
 <header class="bg-custom text-white">
         <div class="container d-flex align-items-center justify-content-between py-2">
@@ -54,16 +55,6 @@
                     </a>
                 </div>
             </div>
-                <div class="nav-item">
-                    <a href="/cart" class="btn btn-dark position-relative cart-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                        {% if session.get('cart') %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ session.get('cart')|length }}
-                        </span>
-                        {% endif %}
-                    </a>
-            </div>
         </div>           
     </header>
     
@@ -78,39 +69,61 @@
                 <li class="nav-item"><a class="nav-link text-dark" href="/products">Shopping</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/bantuan">Bantuan</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/stores">Stores</a></li>
+                <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Categories
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            <a class="dropdown-item" href="/category/daging">Daging</a>
+                            <a class="dropdown-item" href="/category/sayur">Sayur</a>
+                            <a class="dropdown-item" href="/category/bumbu">Bumbu</a>
+                            <a class="dropdown-item" href="/category/buah">Buah</a>
+                            <a class="dropdown-item" href="/category/minuman">Minuman</a>
+                            <a class="dropdown-item" href="/category/snack">Snack</a>
+                            <a class="dropdown-item" href="/category/roti">Roti</a>
+                            <a class="dropdown-item" href="/category/susu">Susu</a>
+                            <a class="dropdown-item" href="/category/beras">Beras</a>
+                            <a class="dropdown-item" href="/category/makanan-beku">Makanan Beku</a>
+                            <a class="dropdown-item" href="/category/makanan-instan">Makanan Instan</a>
+                            <a class="dropdown-item" href="/category/makanan-sehat">Makanan Sehat</a>
+                            <a class="dropdown-item" href="/category/alat-dapur">Alat Dapur</a>
+                            <a class="dropdown-item" href="/category/perawatan-tubuh">Perawatan Tubuh</a>
+                            <a class="dropdown-item" href="/category/perawatan-rumah">Perawatan Rumah</a>
+                            <a class="dropdown-item" href="/category/elektronik">Elektronik</a>
+                            <a class="dropdown-item" href="/category/fashion">Fashion</a>
+                            <a class="dropdown-item" href="/category/olahraga">Olahraga</a>
+                            <a class="dropdown-item" href="/category/mainan">Mainan</a>
+                            <a class="dropdown-item" href="/category/buku">Buku</a>
+                        </div>
+                    </li>
             </ul>
         </div>
     </nav>
 
+    <!-- Products List -->
     <div class="container mt-5">
-        <h2>Products</h2>
-
-        <div class="product-container">
-            {% if products %}
-                {% for product in products %}
-                    <div class="product-card">
-                        <h3>{{ product.title }}</h3>
-                        <p>{{ product.description }}</p>
-                        <p>Harga: {{ format_price(product.price) }}</p> <!-- Format price -->
-                        <p>Diskon: {{ format_discount(product.discount) }}%</p> <!-- Format discount -->
-                        <p>Stock: {{ product.stock }}</p> <!-- Display stock -->
-                        <img src="{{ product.image_path }}" alt="{{ product.title }}" />
-                        <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" onsubmit="showNotification(event)">
-                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <input type="number" name="quantity" value="1" min="1" class="form-control mb-2" />
-                            <button type="submit" class="btn btn-primary">Add to Cart</button>
-                        </form>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="{{ product['image_path'] }}" class="card-img-top" alt="{{ product['title'] }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product['title'] }}</h5>
+                        <p class="card-text">{{ product['description'] }}</p>
+                        <p class="card-text"><strong>Price:</strong> {{ product['price'] }}</p>
+                        <p class="card-text"><strong>Stock:</strong> {{ product['stock'] }}</p>
+                        <a href="/product/{{ product['id'] }}" class="btn btn-primary">View Product</a>
                     </div>
-                {% endfor %}
-            {% else %}
-                <p>No products found.</p>
-            {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-custom text-white">
-        <div class="container-fluid">
+<footer class="bg-custom text-white">
+        <div class="container">
             <div class="row">
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer-menu">
@@ -197,32 +210,14 @@
         </div>
     </footer>
 
-    <div id="chat-popup" class="chat-popup" style="display: none;"> <!-- Initially hidden -->
-        <div class="chat-header">
-            <span>Customer Service</span>
-            <button id="close-chat" class="close-chat">✖</button>
-        </div>
-        <div class="chat-body" id="chat-body">
-            <!-- Messages will be dynamically added here -->
-        </div>
-        <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Type a message..." />
-            <button id="send-button" class="send-button">Send</button>
-        </div>
-    </div>
-    <button id="open-chat" class="open-chat">
-        <i class="fas fa-comment-dots"></i> <!-- Font Awesome chat icon -->
-    </button>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
-    <script src="https://code.iconify.design/1/1.0.0/iconify.min.js"></script>
-    <script>
-        AOS.init();
-    </script>
-    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
+<script src="https://code.iconify.design/1/1.0.0/iconify.min.js"></script>
+<script>
+    AOS.init();
+</script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>
