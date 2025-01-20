@@ -86,6 +86,39 @@
     </div>
 </div>
 
+        <div class="order-history-container">
+        <h3 class="mt-5">Order History</h3>
+            <div class="order-history">
+                {% if orders %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Total Price</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.order_id }}</td>
+                                    <td>{{ order.product_title }}</td>
+                                    <td>{{ order.quantity }}</td>
+                                    <td>{{ order.total_price }}</td>
+                                    <td>{{ order.status }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-orders">No orders found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
 <footer class="bg-custom text-white">
         <div class="container">
             <div class="row">

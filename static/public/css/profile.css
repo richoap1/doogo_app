@@ -94,3 +94,48 @@ body {
 .profile-main h3 {
     margin-top: 0;
 }
+
+/* Order history container styles */
+.order-history-container {
+    margin-top: 30px;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Order history styles */
+.order-history {
+    margin-top: 20px;
+}
+
+.order-history table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.order-history th, .order-history td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.order-history th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+}
+
+.order-history td {
+    background-color: #fff;
+}
+
+.order-history tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+
+.order-history .no-orders {
+    text-align: center;
+    color: #666;
+    margin-top: 20px;
+}

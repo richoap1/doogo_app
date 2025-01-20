@@ -55,7 +55,7 @@ facebook_bp = make_facebook_blueprint(
 app.register_blueprint(facebook_bp, url_prefix='/facebook_login')  
 
 # Define allowed IPs for admin access  
-ALLOWED_ADMIN_IPS = ['127.0.0.1']  # Add your admin IPs here
+# ALLOWED_ADMIN_IPS = ['127.0.0.1']  # Add your admin IPs here
 
 # Database connection function  
 def get_db_connection():    
@@ -190,18 +190,18 @@ def create_store_products_table():
     conn.commit()  
     conn.close()
 
-# Decorator to restrict admin access based on IP  
-def restrict_admin_access(f):  
-    def wrapper(*args, **kwargs):  
-        if request.endpoint in ['admin_chat', 'admin_login', 'admin_page']:  
-            if 'user_id' not in session or session.get('role') != 'admin':  
-                flash("You are not authorized to access this page.")  
-                return redirect(url_for('login'))  # Redirect to login if not authorized  
+# # Decorator to restrict admin access based on IP  
+# def restrict_admin_access(f):  
+#     def wrapper(*args, **kwargs):  
+#         if request.endpoint in ['admin_chat', 'admin_login', 'admin_page']:  
+#             if 'user_id' not in session or session.get('role') != 'admin':  
+#                 flash("You are not authorized to access this page.")  
+#                 return redirect(url_for('login'))  # Redirect to login if not authorized  
             
-            if request.remote_addr not in ALLOWED_ADMIN_IPS:  
-                abort(403)  # Forbidden access  
-        return f(*args, **kwargs)  
-    return wrapper
+#             if request.remote_addr not in ALLOWED_ADMIN_IPS:  
+#                 abort(403)  # Forbidden access  
+#         return f(*args, **kwargs)  
+#     return wrapper
 
 def handle_cart():
     products = []
@@ -275,18 +275,18 @@ def get_reviews(product_id):
     return reviews   
 
     
-@app.before_request  
-@restrict_admin_access  
-def before_request():  
-    pass  # This will run before every request  
+# @app.before_request  
+# @restrict_admin_access  
+# def before_request():  
+#     pass  # This will run before every request  
 
-# Helper functions for formatting  
-def format_price(price):  
-    """Format the price to include 'Rp' and use thousands separators."""  
-    return f"Rp{int(price):,}".replace(',', '.')  
+# # Helper functions for formatting  
+# def format_price(price):  
+#     """Format the price to include 'Rp' and use thousands separators."""  
+#     return f"Rp{int(price):,}".replace(',', '.')  
 
-# Register helper functions in Jinja2  
-app.jinja_env.globals.update(format_price=format_price)
+# # Register helper functions in Jinja2  
+# app.jinja_env.globals.update(format_price=format_price)
 
 @app.route('/')  
 def index():  
@@ -541,32 +541,36 @@ def notifications():
 
     return render_template('notifications.php', notifications=notifications)    
 
-@app.route('/update_order_status/<int:order_id>', methods=['POST'])    
-@login_required    
-def update_order_status(order_id):    
-    user_id = session.get('user_id')    
-    if not user_id:    
-        return redirect(url_for('login'))    
+@app.route('/update_order_status/<int:order_id>', methods=['POST'])
+@login_required
+def update_order_status(order_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
 
-    new_status = request.form['status']  # Get the new status from the form    
+    new_status = request.form['status']  # Get the new status from the form
 
-    with get_db_connection() as conn:    
-        # Check if the user is the seller of the products in the order    
-        products = conn.execute("SELECT product_id FROM order_items WHERE order_id = ?", (order_id,)).fetchall()    
-        product_ids = [product['product_id'] for product in products]    
+    with get_db_connection() as conn:
+        # Check if the user is the seller of the products in the order
+        products = conn.execute("SELECT product_id FROM order_items WHERE order_id = ?", (order_id,)).fetchall()
+        product_ids = [product['product_id'] for product in products]
 
-        # Check if the seller owns any of the products    
-        store_id = conn.execute("SELECT store_id FROM products WHERE id IN ({})".format(','.join('?' * len(product_ids))), product_ids).fetchone()    
-        
-        if store_id and store_id['store_id'] == conn.execute("SELECT store_id FROM stores WHERE owner_id = ?", (user_id,)).fetchone()['store_id']:  
-            # Update the order status if the seller owns the products  
-            conn.execute("UPDATE orders SET status = ? WHERE id = ?", (new_status, order_id))    
-            conn.commit()    
-            flash("Order status updated successfully!")    
-        else:    
-            flash("You are not authorized to update this order status.")    
+        # Check if the seller owns any of the products
+        store = conn.execute("SELECT id FROM stores WHERE owner_id = ?", (user_id,)).fetchone()
+        if store:
+            store_id = store['id']
+            product_store_ids = conn.execute("SELECT DISTINCT store_id FROM products WHERE id IN ({})".format(','.join('?' * len(product_ids))), product_ids).fetchall()
+            if any(ps['store_id'] == store_id for ps in product_store_ids):
+                # Update the order status if the seller owns the products
+                conn.execute("UPDATE orders SET status = ? WHERE id = ?", (new_status, order_id))
+                conn.commit()
+                flash("Order status updated successfully!")
+            else:
+                flash("You are not authorized to update this order status.")
+        else:
+            flash("Store not found.")
 
-    return redirect(url_for('notifications'))  # Redirect to notifications page  
+    return redirect(url_for('seller_dashboard'))
 
 # Register route  
 @app.route('/register', methods=['GET', 'POST'])    
@@ -894,8 +898,6 @@ def seller_dashboard():
     return render_template('seller_dashboard.php', store=store, products=formatted_products, orders=orders)  
 
 
-
-
 @app.route('/register_vendor', methods=['GET', 'POST'])
 def register_vendor():
     if request.method == 'POST':
@@ -1060,19 +1062,33 @@ def fetch_all_messages():
     messages_list = [{'id': message['id'], 'email': message['email'], 'content': message['content'], 'response': message['response']} for message in messages]  # Use email instead of user_id  
     return {'messages': messages_list}  
 
-@app.route('/profile')  
-def profile():  
-    # Check if the user is logged in  
-    if 'user_id' not in session:  
-        flash("You are not authorized to access this page.")  
-        return redirect(url_for('login'))  # Redirect to login if not authorized  
+@app.route('/profile')
+@login_required
+def profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return redirect(url_for('login'))
 
-    # Fetch user information from the database  
-    conn = get_db_connection()  
-    user = conn.execute("SELECT email, name, address, gender, role FROM users WHERE id = ?", (session['user_id'],)).fetchone()  
-    conn.close()  
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    
+    orders = conn.execute('''
+        SELECT o.id AS order_id, o.status, oi.quantity, p.title AS product_title, (oi.quantity * p.price) AS total_price
+        FROM orders o
+        JOIN order_items oi ON o.id = oi.order_id
+        JOIN products p ON oi.product_id = p.id
+        WHERE o.email = ?
+    ''', (user['email'],)).fetchall()
+    
+    formatted_orders = []
+    for order in orders:
+        formatted_order = dict(order)
+        formatted_order['total_price'] = locale.currency(order['total_price'], grouping=True)
+        formatted_orders.append(formatted_order)
+        
+    conn.close()
 
-    return render_template('profile.php', user=user)  # Pass user data to the template  
+    return render_template('profile.php', user=user, orders=formatted_orders)
 
 @app.route('/search', methods=['GET'])  
 def search():  
