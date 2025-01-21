@@ -242,37 +242,39 @@ def add_stock_column():
     conn.commit()
     conn.close()
     
-def product_detail(product_id):      
-    product = get_product_details(product_id)      
-    print(f"Fetching product details for ID: {product_id}")  # Debugging line  
-    print(f"Product details: {product}")  # Debugging line  
-    if not product:      
-        flash("Product not found.")      
-        return redirect(url_for('products'))      
-
-def get_product_details(product_id):    
-    conn = get_db_connection()    
-    product = conn.execute('''    
-        SELECT p.*, s.name as store_name, s.image_path as store_logo, s.rating as store_rating    
-        FROM products p    
-        JOIN stores s ON p.store_id = s.id    
-        WHERE p.id = ?    
-    ''', (product_id,)).fetchone()    
-    conn.close()    
+def get_product_details(product_id):  
+    conn = get_db_connection()  
+    product = conn.execute('''  
+        SELECT p.*, s.name as store_name, s.image_path as store_logo, s.rating as store_rating  
+        FROM products p  
+        JOIN stores s ON p.store_id = s.id  
+        WHERE p.id = ?  
+    ''', (product_id,)).fetchone()  
+    conn.close()  
+    if product:  
+        product = dict(product)  
+        # Use the paths directly from the database  
+        product['image_path'] = product['image_path']  # No need to prepend  
+        product['store_logo'] = product['store_logo']  # No need to prepend  
     print(f"Product details for ID {product_id}: {product}")  # Debugging line  
-    return product    
+    return product  
 
-def get_reviews(product_id):    
-    conn = get_db_connection()    
-    reviews = conn.execute('''    
-        SELECT r.*, u.name as user_name, u.image_path as user_profile_image    
-        FROM reviews r    
-        JOIN users u ON r.user_id = u.id    
-        WHERE r.product_id = ?    
-    ''', (product_id,)).fetchall()    
-    conn.close()    
-    print(f"Reviews for product ID {product_id}: {reviews}")  # Debugging line  
-    return reviews   
+
+
+def get_reviews(product_id):
+    conn = get_db_connection()
+    reviews = conn.execute('''
+        SELECT r.*, u.name as user_name, u.image_path as user_profile_image
+        FROM reviews r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.product_id = ?
+    ''', (product_id,)).fetchall()
+    conn.close()
+    reviews = [dict(review) for review in reviews]
+    for review in reviews:
+        review['user_profile_image'] = 'uploads/' + review['user_profile_image']
+    print(f"Reviews for product ID {product_id}: {reviews}")  # Debugging line
+    return reviews
 
     
 # @app.before_request  
@@ -343,59 +345,61 @@ def products():
 
         return redirect(url_for('products'))  
 
-    # Handle GET request to display products  
-    products = conn.execute("SELECT * FROM products").fetchall()  
-    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()  
+    # Handle GET request to display products
+    products = conn.execute("SELECT * FROM products").fetchall()
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
 
-    # Format prices  
-    formatted_products = []  
-    for product in products:  
-        formatted_product = dict(product)  
-        formatted_product['price'] = locale.currency(product['price'], grouping=True)  
-        formatted_products.append(formatted_product)  
+    # Format prices
+    formatted_products = []
+    for product in products:
+        formatted_product = dict(product)
+        formatted_product['price'] = locale.currency(product['price'], grouping=True)
+        formatted_products.append(formatted_product)
 
-    conn.close()  
+    conn.close()
 
-    return render_template('products.php', products=formatted_products, store=store)  # Ensure this points to your products template  
+    return render_template('products.php', products=formatted_products, store=store)  # Ensure this points to your products template
 
-@app.route('/product/<int:product_id>', methods=['GET', 'POST'])  
-def product_detail(product_id):  
-    product = get_product_details(product_id)  
-    if not product:  
-        flash("Product not found.")  
-        return redirect(url_for('products'))  
+@app.route('/product/<int:product_id>', methods=['GET', 'POST'])
+def product_detail(product_id):
+    product = get_product_details(product_id)
+    print(f"Fetching product details for ID: {product_id}")  # Debugging line
+    print(f"Product details: {product}")  # Debugging line
+    if not product:
+        flash("Product not found.")
+        return redirect(url_for('products'))
 
-    reviews = get_reviews(product_id)  
+    reviews = get_reviews(product_id)
 
-    # Format price  
-    product['price'] = locale.currency(product['price'], grouping=True)  
+    # Format price
+    product['price'] = locale.currency(product['price'], grouping=True)
 
-    if request.method == 'POST':  
-        user_id = session.get('user_id')  
-        if not user_id:  
-            flash("You need to be logged in to add a review.")  
-            return redirect(url_for('login'))  
+    if request.method == 'POST':
+        user_id = session.get('user_id')
+        if not user_id:
+            flash("You need to be logged in to add a review.")
+            return redirect(url_for('login'))
 
-        conn = get_db_connection()  
-        user = conn.execute('SELECT name FROM users WHERE id = ?', (user_id,)).fetchone()  
-        user_name = user['name'] if user else 'Anonymous'  
+        conn = get_db_connection()
+        user = conn.execute('SELECT name FROM users WHERE id = ?', (user_id,)).fetchone()
+        user_name = user['name'] if user else 'Anonymous'
 
-        rating = request.form.get('rating')  
-        comment = request.form.get('comment')  
-        store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()  
+        rating = request.form.get('rating')
+        comment = request.form.get('comment')
 
-        # Add review to database  
-        conn.execute('''  
-            INSERT INTO reviews (product_id, user_id, user_name, rating, comment)  
-            VALUES (?, ?, ?, ?, ?)  
-        ''', (product_id, user_id, user_name, rating, comment))  
-        conn.commit()  
-        conn.close()  
+        # Add review to database
+        conn.execute('''
+            INSERT INTO reviews (product_id, user_id, user_name, rating, comment)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (product_id, user_id, user_name, rating, comment))
+        conn.commit()
+        conn.close()
 
-        flash("Review added successfully!")  
-        return redirect(url_for('product_detail', product_id=product_id))  
+        flash("Review added successfully!")
+        return redirect(url_for('detail_products', product_id=product_id))
 
-    return render_template('detail_products.php', product=product, reviews=reviews, store=store) 
+    return render_template('detail_products.php', product=product, reviews=reviews)
+
 @app.route('/cart')
 def cart():
     user_id = session.get('user_id')  
