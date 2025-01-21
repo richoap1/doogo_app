@@ -4,7 +4,6 @@ body {
     margin: 0;
     padding: 0;
     line-height: 1.6;
-    background-image: url('../images/Vector.png'); /* Path to your image */
     background-size: cover; /* Cover the entire body */
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Prevent the image from repeating */

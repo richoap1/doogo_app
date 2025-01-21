@@ -1,99 +1,61 @@
-/* General styles */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
+/* Container for the form */  
+* Profile Container Styles */  
+.profile-container {  
+    max-width: 600px; /* Limit the width of the form */  
+    margin: 50px auto; /* Center the form on the page */  
+    padding: 20px; /* Padding inside the container */  
+    background-color: #ffffff; /* White background for the form */  
+    border-radius: 8px; /* Rounded corners */  
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */  
+}  
+
+/* Form Elements */  
+.profile-container label {  
+    font-weight: bold; /* Bold labels for better readability */  
+    margin-bottom: 5px; /* Space between label and input */  
+}  
+
+.profile-container input {  
+    width: 100%; /* Full width inputs */  
+    padding: 10px; /* Padding inside inputs */  
+    margin-bottom: 15px; /* Space between inputs */  
+    border: 1px solid #ced4da; /* Light border */  
+    border-radius: 4px; /* Rounded corners for inputs */  
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+/* Profile Button Styles */  
+.profile-btn {  
+    background-color: #007bff; /* Shade of blue */  
+    color: white; /* Text color */  
+    padding: 10px 20px; /* Padding */  
+    border: none; /* No border */  
+    border-radius: 5px; /* Rounded corners */  
+    font-size: 16px; /* Font size */  
+    transition: background-color 0.3s ease; /* Transition effect for hover state */  
+    cursor: pointer; /* Pointer cursor on hover */  
+    outline: none; /* Remove outline on focus */
+    margin-top: 20px; /* Space above the button */  
+}  
 
-/* Profile page styles */
-.profile-header {
-    background-color: white;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-}
+.profile-btn:hover {  
+    background-color: #0056b3; /* Darker shade of blue on hover */  
+}  
 
-.profile-header img {
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    margin-right: 20px;
-}
+/* Responsive Design */  
+@media (max-width: 768px) {  
+    .profile-btn {  
+        padding: 8px 16px; /* Smaller padding on smaller screens */  
+        font-size: 14px; /* Smaller font size on smaller screens */  
+    }  
+}  
 
-.profile-header .profile-info {
-    flex-grow: 1;
-}
-
-.profile-header .profile-info h2 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.profile-header .profile-info p {
-    margin: 5px 0;
-    color: #666;
-}
-
-.profile-header .profile-actions {
-    display: flex;
-    align-items: center;
-}
-
-.profile-header .profile-actions button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-/* Profile content styles */
-.profile-content {
-    display: flex;
-    margin-top: 20px;
-}
-
-.profile-sidebar {
-    width: 250px;
-    background-color: white;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-}
-
-.profile-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.profile-sidebar ul li {
-    margin-bottom: 10px;
-}
-
-.profile-sidebar ul li a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.profile-main {
-    flex-grow: 1;
-    background-color: white;
-    padding: 20px;
-    margin-left: 20px;
-}
-
-.profile-main h3 {
-    margin-top: 0;
-}
+/* Responsive Styles */  
+@media (max-width: 768px) {  
+    .profile-container {  
+        margin: 20px; /* Reduce margin on smaller screens */  
+        padding: 15px; /* Reduce padding on smaller screens */  
+    }  
+}  
 
 /* Order history container styles */
 .order-history-container {

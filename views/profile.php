@@ -3,6 +3,7 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon"       href="{{ url_for('static', filename='public/images/logo.png') }}" alt="Logo" />
         <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='public/css/chat.css') }}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -14,7 +15,7 @@
         <title>Doogo</title>
     </head>
 <body>
-    <header class="bg-custom text-white">
+<header class="bg-custom text-white">
         <div class="container d-flex align-items-center justify-content-between py-2">
             <a href="{% if session.get('user_id') %}{{ url_for('homepage') }}{% else %}{{ url_for('index') }}{% endif %}" class="logo-link">
                 <img class="logo" src="{{ url_for('static', filename='public/images/logo.png') }}" alt="Logo" />
@@ -32,6 +33,11 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
+                        {% if store %}
+                        <a class="dropdown-item" href="/seller_dashboard">Store</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/register_vendor">Register Store</a>
+                        {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Logout</a>
                     </div>
@@ -54,6 +60,16 @@
                         EN
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="/cart" class="btn btn-dark position-relative cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if session.get('cart') %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ session.get('cart')|length }}
+                        </span>
+                        {% endif %}
+                    </a>
+                </div>
             </div>
         </div>           
     </header>
@@ -65,59 +81,80 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-dark" href="#about-section">About Us</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/#about-section">About Us</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/products">Shopping</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/bantuan">Bantuan</a></li>
-                <li class="nav-item"><a class="nav-link text-dark" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/stores">Stores</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Categories
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                        {% for category in categories %}
+                        <a class="dropdown-item" href="/category/{{ category['id'] }}">{{ category['name'] }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>
+    
+    <form method="POST" action="{{ url_for('update_profile') }}">  
+        <div class="profile-cointaner">  
+            <label for="email">Email:</label>  
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>  
+        </div>  
+        <div class="profile-cointaner">  
+            <label for="name">Name:</label>  
+            <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>  
+        </div>  
+        <div class="profile-cointaner">  
+            <label for="address">Address:</label>  
+            <input type="text" class="form-control" id="address" name="address" value="{{ user.address }}" required>  
+        </div>  
+        <div class="profile-cointaner">  
+            <label for="gender">Gender:</label>  
+            <select class="form-control" id="gender" name="gender" required>  
+                <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>  
+                <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>  
+                <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>  
+            </select>  
+        </div>  
+        <button type="submit" class="profile-btn">Update Profile</button>  
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary">Cancel</a>  
+    </form>  
 
-<div class="container mt-5">
-    <h2 class="text-center">User Profile</h2>
-    <div class="card">
-        <div class="card-body">
-            <p class="card-text"><strong>Email:</strong>{{ user.email }}</p>
-            <p class="card-text"><strong>Name:</strong> {{ user.name }}</p>
-            <p class="card-text"><strong>Address:</strong> {{ user.address }}</p>
-            <p class="card-text"><strong>Gender:</strong> {{ user.gender }}</p>
-            <p class="card-text"><strong>Role:</strong> {{ user.role }}</p>
-        </div>
-    </div>
-</div>
 
-        <div class="order-history-container">
-        <h3 class="mt-5">Order History</h3>
-            <div class="order-history">
-                {% if orders %}
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Total Price</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in orders %}
-                                <tr>
-                                    <td>{{ order.order_id }}</td>
-                                    <td>{{ order.product_title }}</td>
-                                    <td>{{ order.quantity }}</td>
-                                    <td>{{ order.total_price }}</td>
-                                    <td>{{ order.status }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p class="no-orders">No orders found.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+        <h3>Order History</h3>  
+        <div class="order-history">  
+            {% if orders %}  
+                <table>  
+                    <thead>  
+                        <tr>  
+                            <th>Order ID</th>  
+                            <th>Status</th>  
+                            <th>Product Title</th>  
+                            <th>Quantity</th>  
+                            <th>Total Price</th>  
+                        </tr>  
+                    </thead>  
+                    <tbody>  
+                        {% for order in orders %}  
+                            <tr>  
+                                <td>{{ order.order_id }}</td>  
+                                <td>{{ order.status }}</td>  
+                                <td>{{ order.product_title }}</td>  
+                                <td>{{ order.quantity }}</td>  
+                                <td>{{ order.total_price }}</td>  
+                            </tr>  
+                        {% endfor %}  
+                    </tbody>  
+                </table>  
+            {% else %}  
+                <p>No orders found.</p>  
+            {% endif %}  
+        </div>  
+    </div> 
 
 <footer class="bg-custom text-white">
         <div class="container">

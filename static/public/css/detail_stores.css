@@ -1,0 +1,58 @@
+.store-products-container {  
+    margin-top: 20px; /* Space above the product list */ 
+    margin-bottom: 20px; /* Space below the product list */
+}  
+
+.store-products-container .list-group-item {  
+    border: 1px solid #ddd; /* Light border for product cards */
+    border-radius: 10px; /* Rounded corners */
+    padding: 15px; /* Padding inside product cards */
+    background-color: #fff; /* White background for product cards */
+    text-align: center; /* Center text and images */
+    transition: box-shadow 0.3s, transform 0.3s; /* Smooth transition for shadow and transform */
+} 
+
+.store-products-container .list-group-item:hover {  
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow on hover */  
+}  
+
+.store-products-container .product-image {  
+    width: 100%; /* Make the image responsive */
+    height: 200px; /* Fixed height for images */
+    object-fit: cover; /* Cover the area without stretching */
+    border-radius: 10px; /* Rounded corners for images */  
+}  
+
+.store-products-container .product-title {  
+    font-weight: bold; /* Make the title bold */  
+    margin: 0; /* Remove default margin */  
+    color: black; /* Set the text color to black */  
+    text-decoration: none; /* Remove underline */  
+}  
+
+
+.store-products-container .card-text {  
+    margin: 5px 0; /* Space between text elements */  
+    text-align: center; /* Center the text */  
+}  
+
+.store-products-container .price {  
+    font-size: 1.1em; /* Slightly larger font for price */  
+    color: #333; /* Darker color for price */  
+}  
+
+.store-products-container .stock {  
+    font-size: 0.9em; /* Smaller font for stock */  
+    color: #666; /* Lighter color for stock */  
+}  
+
+.store-products-container .btn {  
+    margin-top: 10px; /* Space above the button */
+    /* background-color: #4a90e2; */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+}

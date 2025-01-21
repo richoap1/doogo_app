@@ -103,55 +103,6 @@ header {
     font-size: 0.8em; /* Font size for the badge */
 }
 
-/* Footer Styles */
-footer {
-    background-color: #008FD5; /* Custom footer background color */
-    color: white; /* Footer text color */
-    padding: 40px 0; /* Padding for the footer */
-    width: 100%; /* Full width */
-    margin: 0; /* Remove default margin */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-}
-
-.footer-menu {
-    margin-bottom: 20px; /* Space between footer menus */
-}
-
-.footer-menu h5 {
-    font-size: 18px; /* Font size for titles */
-    margin-bottom: 15px; /* Space below titles */
-    font-weight: bold; /* Make titles bold */
-}
-
-.menu-list {
-    padding: 0; /* Remove padding */
-}
-
-.menu-item {
-    margin-bottom: 10px; /* Space between menu items */
-}
-
-.nav-link {
-    color: white; /* Link color */
-    text-decoration: none; /* Remove underline */
-    transition: color 0.3s; /* Smooth color transition */
-}
-
-.nav-link:hover {
-    color: #ff4081; /* Change color on hover */
-}
-
-/* Subscribe Section Styles */
-.footer-menu p {
-    margin: 10px 0; /* Space above and below the paragraph */
-}
-
-/* Input Field Styles */
-.form-control {
-    border: 1px solid #ccc; /* Border for input */
-    border-radius: 5px; /* Rounded corners */
-}
-
 /* Table Styles */
 .table {
     width: 100%;

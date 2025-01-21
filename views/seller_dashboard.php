@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard</title>
+    <link rel="icon"       href="{{ url_for('static', filename='public/images/logo.png') }}" alt="Logo" />
     <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='public/css/seller_dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='public/css/chat.css') }}">
@@ -75,10 +76,20 @@
                 <li class="nav-item"><a class="nav-link text-dark" href="/products">Shopping</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/bantuan">Bantuan</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/stores">Stores</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Categories
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                        {% for category in categories %}
+                        <a class="dropdown-item" href="/category/{{ category['id'] }}">{{ category['name'] }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>
-
     <div class="container mt-5 modern-container">
         <h2>Seller Dashboard</h2>
         {% if store %}

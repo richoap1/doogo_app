@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"       href="{{ url_for('static', filename='public/images/logo.png') }}" alt="Logo" />
     <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='public/css/chat.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -31,6 +32,11 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
+                        {% if store %}
+                        <a class="dropdown-item" href="/seller_dashboard">Store</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/register_vendor">Register Store</a>
+                        {% endif %}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Logout</a>
                     </div>
@@ -53,6 +59,16 @@
                         EN
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="/cart" class="btn btn-dark position-relative cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if session.get('cart') %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ session.get('cart')|length }}
+                        </span>
+                        {% endif %}
+                    </a>
+                </div>
             </div>
         </div>           
     </header>
@@ -64,10 +80,20 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-dark" href="#about-section">About Us</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/#about-section">About Us</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/products">Shopping</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/bantuan">Bantuan</a></li>
-                <li class="nav-item"><a class="nav-link text-dark" href="#">Blog</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/stores">Stores</a></li>
+                <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Categories
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            {% for category in categories %}
+                            <a class="dropdown-item" href="/category/{{ category['name'] }}">{{ category['name'] }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
             </ul>
         </div>
     </nav>

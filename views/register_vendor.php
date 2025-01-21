@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Store</title>
+    <link rel="icon"       href="{{ url_for('static', filename='public/images/logo.png') }}" alt="Logo" />
     <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='public/css/form.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>

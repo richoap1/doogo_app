@@ -3,6 +3,7 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon"       href="{{ url_for('static', filename='public/images/logo.png') }}" alt="Logo" />
         <link rel="stylesheet" href="{{ url_for('static', filename='public/css/styles.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='public/css/chat.css') }}">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -80,25 +81,23 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link text-dark" href="#about-section">About Us</a></li>
+                <li class="nav-item"><a class="nav-link text-dark" href="/#about-section">About Us</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/products">Shopping</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/bantuan">Bantuan</a></li>
-                <li class="nav-item"><a class="nav-link text-dark" href="#">Blog</a></li>
                 <li class="nav-item"><a class="nav-link text-dark" href="/stores">Stores</a></li>
                 <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Categories
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                            {% for category in categories %}
-                            <a class="dropdown-item" href="/category/{{ category['name'] }}">{{ category['name'] }}</a>
-                            {% endfor %}
-                        </div>
-                    </li>
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Categories
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                        {% for category in categories %}
+                        <a class="dropdown-item" href="/category/{{ category['id'] }}">{{ category['name'] }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>
-
     <!-- Products List -->
     <div class="products container mt-5">
         <div class="row">

@@ -91,7 +91,43 @@ def create_reviews_table():
         )  
     ''')  
     conn.commit()  
+    conn.close()
+    
+def get_categories():  
+    # Koneksi ke database  
+    conn = get_db_connection()
+    cursor = conn.cursor()  
+    
+    # Query untuk mengambil semua kategori  
+    cursor.execute("SELECT id, name FROM categories")  
+    categories = cursor.fetchall()  
+    
+    # Menutup koneksi  
     conn.close()  
+    
+    # Mengubah hasil query menjadi list of dictionaries  
+    categories_list = [{'id': row[0], 'name': row[1]} for row in categories]  
+    return categories_list
+
+def get_products_by_category(category_id):    
+    conn = get_db_connection()    
+    products = conn.execute('SELECT * FROM products WHERE category_id = ?', (category_id,)).fetchall()    
+    conn.close()  
+    
+    # Convert products to a list of dictionaries and format image paths  
+    formatted_products = []  
+    for product in products:  
+        product_dict = dict(product)  
+        
+        # Ensure the image path uses forward slashes  
+        product_dict['image_path'] = product_dict['image_path'].replace('\\', '/')  # Replace backslashes with forward slashes  
+        
+        # Remove any existing 'static/' prefix if present  
+        product_dict['image_path'] = product_dict['image_path'].replace('static/', '')  
+        
+        formatted_products.append(product_dict)  
+    
+    return formatted_products  
 
 
 def send_registration_email(user_email, user_name):    
@@ -242,23 +278,54 @@ def add_stock_column():
     conn.commit()
     conn.close()
     
-def get_product_details(product_id):  
-    conn = get_db_connection()  
-    product = conn.execute('''  
-        SELECT p.*, s.name as store_name, s.image_path as store_logo, s.rating as store_rating  
-        FROM products p  
-        JOIN stores s ON p.store_id = s.id  
-        WHERE p.id = ?  
-    ''', (product_id,)).fetchone()  
-    conn.close()  
-    if product:  
-        product = dict(product)  
-        # Use the paths directly from the database  
-        product['image_path'] = product['image_path']  # No need to prepend  
-        product['store_logo'] = product['store_logo']  # No need to prepend  
-    print(f"Product details for ID {product_id}: {product}")  # Debugging line  
-    return product  
+def get_product_details(product_id):        
+    conn = get_db_connection()        
+    product = conn.execute('''        
+        SELECT p.*, s.name as store_name, s.image_path as store_logo, s.store_rating        
+        FROM products p        
+        JOIN stores s ON p.store_id = s.id        
+        WHERE p.id = ?        
+    ''', (product_id,)).fetchone()        
+    conn.close()        
+    
+    if product:        
+        product = dict(product)        
+        
+        # Ensure the image paths use forward slashes  
+        product['image_path'] = product['image_path'].replace('\\', '/')  # Replace backslashes with forward slashes  
+        product['store_logo'] = product['store_logo'].replace('\\', '/')  # Replace backslashes with forward slashes  
+        
+        # Ensure the paths are relative to the static folder  
+        if not product['image_path'].startswith('static/'):  
+            product['image_path'] = f"static/uploads/{product['image_path']}"  
+        
+        if not product['store_logo'].startswith('static/'):  
+            product['store_logo'] = f"static/uploads/{product['store_logo']}"  
+    
+    print(f"Product details for ID {product_id}: {product}")  # Debugging line        
+    return product    
 
+def get_store_details(store_id):    
+    conn = get_db_connection()    
+    store = conn.execute('''    
+        SELECT * FROM stores WHERE id = ?    
+    ''', (store_id,)).fetchone()    
+    products = conn.execute('SELECT * FROM products WHERE store_id = ?', (store_id,)).fetchall()    
+    conn.close()    
+
+    if store:    
+        store = dict(store)    
+        # Ensure the image path for the store does not include 'static'    
+        if 'image_path' in store:    
+            store['image_path'] = store['image_path'].replace('\\', '/')  # Replace backslashes with forward slashes
+
+    products = [dict(product) for product in products]    
+    for product in products:    
+        if 'image_path' in product:    
+            product['image_path'] = product['image_path'].replace('\\', '/')  # Replace backslashes with forward slashes  
+
+    print(f"Store details for ID {store_id}: {store}")  # Debugging line    
+    return store, products  
 
 
 def get_reviews(product_id):
@@ -272,7 +339,10 @@ def get_reviews(product_id):
     conn.close()
     reviews = [dict(review) for review in reviews]
     for review in reviews:
-        review['user_profile_image'] = 'uploads/' + review['user_profile_image']
+        if review['user_profile_image']:
+            review['user_profile_image'] = 'uploads/' + review['user_profile_image']
+        else:
+            review['user_profile_image'] = 'uploads/default_profile.png'  # Default profile image if none is provided
     print(f"Reviews for product ID {product_id}: {reviews}")  # Debugging line
     return reviews
 
@@ -300,6 +370,7 @@ def about():
 
 @app.route('/homepage')
 def homepage():
+    categories = get_categories() 
     user_id = session.get('user_id')
     if not user_id:
         return redirect(url_for('login'))
@@ -307,14 +378,20 @@ def homepage():
     conn = get_db_connection()
     store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
     conn.close()
-    return render_template('homepage.ejs', store=store)
+    return render_template('homepage.ejs', store=store, categories=categories)
 
 @app.route('/layanan')  
 def layanan():  
-    return render_template('layanan.ejs')  
+    return render_template('layanan.ejs')
+
+@app.route('/category/<int:category_id>')  
+def category_page(category_id):  
+    products = get_products_by_category(category_id)  
+    return render_template('category.ejs', products=products)  
 
 @app.route('/products', methods=['GET', 'POST'])  
-def products():  
+def products():
+    categories = get_categories()   
     user_id = session.get('user_id')  
     conn = get_db_connection()  
 
@@ -341,9 +418,11 @@ def products():
             session['cart'][product_id] = quantity  # Add new product to cart  
 
         session.modified = True  # Mark session as modified  
-        flash("Product added to cart!")  # Flash message for user feedback  
+        flash("Product added to cart!")  # Flash message for user feedback
+        
+        store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
 
-        return redirect(url_for('products'))  
+        return redirect(url_for('products', store=store))  # Redirect to the products page
 
     # Handle GET request to display products
     products = conn.execute("SELECT * FROM products").fetchall()
@@ -358,7 +437,7 @@ def products():
 
     conn.close()
 
-    return render_template('products.php', products=formatted_products, store=store)  # Ensure this points to your products template
+    return render_template('products.php', products=formatted_products, store=store, categories=categories)  # Ensure this points to your products template
 
 @app.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
@@ -371,8 +450,17 @@ def product_detail(product_id):
 
     reviews = get_reviews(product_id)
 
+    # Calculate average rating
+    avg_rating = None
+    if reviews:
+        avg_rating = round(sum(review['rating'] for review in reviews) / len(reviews), 1)
+
     # Format price
     product['price'] = locale.currency(product['price'], grouping=True)
+
+    conn = get_db_connection()
+    store = conn.execute('SELECT * FROM stores WHERE id = ?', (product['store_id'],)).fetchone()
+    conn.close()
 
     if request.method == 'POST':
         user_id = session.get('user_id')
@@ -380,25 +468,77 @@ def product_detail(product_id):
             flash("You need to be logged in to add a review.")
             return redirect(url_for('login'))
 
-        conn = get_db_connection()
-        user = conn.execute('SELECT name FROM users WHERE id = ?', (user_id,)).fetchone()
-        user_name = user['name'] if user else 'Anonymous'
-
         rating = request.form.get('rating')
         comment = request.form.get('comment')
 
+        conn = get_db_connection()
         # Add review to database
         conn.execute('''
-            INSERT INTO reviews (product_id, user_id, user_name, rating, comment)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (product_id, user_id, user_name, rating, comment))
+            INSERT INTO reviews (product_id, user_id, rating, comment)
+            VALUES (?, ?, ?, ?)
+        ''', (product_id, user_id, rating, comment))
+        conn.commit()
+
+        # Calculate new average rating
+        new_rating = conn.execute('''
+            SELECT AVG(rating) as avg_rating
+            FROM reviews
+            WHERE product_id = ?
+        ''', (product_id,)).fetchone()['avg_rating']
+
+        # Update product rating
+        conn.execute('''
+            UPDATE products
+            SET rating = ?
+            WHERE id = ?
+        ''', (new_rating, product_id))
+        conn.commit()
+
+        # Calculate new store rating
+        store_id = product['store_id']
+        new_store_rating = conn.execute('''
+            SELECT AVG(r.rating) as avg_store_rating
+            FROM reviews r
+            JOIN products p ON r.product_id = p.id
+            WHERE p.store_id = ?
+        ''', (store_id,)).fetchone()['avg_store_rating']
+
+        # Update store rating
+        conn.execute('''
+            UPDATE stores
+            SET store_rating = ?
+            WHERE id = ?
+        ''', (new_store_rating, store_id))
         conn.commit()
         conn.close()
 
         flash("Review added successfully!")
-        return redirect(url_for('detail_products', product_id=product_id))
+        return redirect(url_for('product_detail', product_id=product_id))
 
-    return render_template('detail_products.php', product=product, reviews=reviews)
+    return render_template('detail_products.php', product=product, reviews=reviews, avg_rating=avg_rating, store=store)
+
+@app.route('/add_review', methods=['POST'])
+def add_review():
+    product_id = request.form.get('product_id')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash("You need to be logged in to add a review.")
+        return redirect(url_for('login'))
+
+    rating = request.form.get('rating')
+    comment = request.form.get('comment')
+
+    conn = get_db_connection()
+    # Add review to database
+    conn.execute('''
+        INSERT INTO reviews (product_id, user_id, rating, comment)
+        VALUES (?, ?, ?, ?)
+    ''', (product_id, user_id, rating, comment))
+    conn.commit()
+    conn.close()
+
+    flash("Review added successfully!")
+    return redirect(url_for('product_detail', product_id=product_id))
 
 @app.route('/cart')
 def cart():
@@ -749,7 +889,9 @@ def admin_login():
 
 @app.route('/bantuan', methods=['GET', 'POST'])    
 @login_required    
-def bantuan():    
+def bantuan():
+    user_id = session.get('user_id')
+    categories = get_categories()     
     if request.method == 'POST':    
         user_message = request.form['user_message']    
         user_email = session.get('email')  # Get email from session    
@@ -767,9 +909,13 @@ def bantuan():
 
     # Fetch messages and responses for the logged-in user    
     with get_db_connection() as conn:    
-        messages = conn.execute("SELECT * FROM messages WHERE email = ?", (session.get('email'),)).fetchall()    
+        messages = conn.execute("SELECT * FROM messages WHERE email = ?", (session.get('email'),)).fetchall() 
+        
+    conn = get_db_connection()
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
+    conn.close()   
 
-    return render_template('bantuan.ejs', messages=messages)   
+    return render_template('bantuan.ejs', messages=messages, categories=categories, store=store)
 
 @app.route('/admin_page')    
 @login_required    
@@ -1066,47 +1212,114 @@ def fetch_all_messages():
     messages_list = [{'id': message['id'], 'email': message['email'], 'content': message['content'], 'response': message['response']} for message in messages]  # Use email instead of user_id  
     return {'messages': messages_list}  
 
-@app.route('/profile')
-@login_required
-def profile():
-    user_id = session.get('user_id')
-    if not user_id:
-        return redirect(url_for('login'))
+# Route to display the user profile  
+@app.route('/profile')  
+@login_required  
+def profile():  
+    categories = get_categories()  
+    user_id = session.get('user_id')  
+    if not user_id:  
+        return redirect(url_for('login'))  
 
-    conn = get_db_connection()
-    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    conn = get_db_connection()  
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()  
     
-    orders = conn.execute('''
-        SELECT o.id AS order_id, o.status, oi.quantity, p.title AS product_title, (oi.quantity * p.price) AS total_price
-        FROM orders o
-        JOIN order_items oi ON o.id = oi.order_id
-        JOIN products p ON oi.product_id = p.id
-        WHERE o.email = ?
-    ''', (user['email'],)).fetchall()
+    # Fetching the user's order history  
+    orders = conn.execute('''  
+        SELECT o.id AS order_id, o.status, oi.quantity, p.title AS product_title, (oi.quantity * p.price) AS total_price  
+        FROM orders o  
+        JOIN order_items oi ON o.id = oi.order_id  
+        JOIN products p ON oi.product_id = p.id  
+        WHERE o.email = ?  
+    ''', (user['email'],)).fetchall()  
     
-    formatted_orders = []
-    for order in orders:
-        formatted_order = dict(order)
-        formatted_order['total_price'] = locale.currency(order['total_price'], grouping=True)
-        formatted_orders.append(formatted_order)
+    # Formatting the total price for better readability  
+    formatted_orders = []  
+    for order in orders:  
+        formatted_order = dict(order)  
+        formatted_order['total_price'] = locale.currency(order['total_price'], grouping=True)  
+        formatted_orders.append(formatted_order)  
         
+    conn.close()  
+
+    return render_template('profile.php', user=user, orders=formatted_orders, categories=categories)  
+
+# Route to handle the profile update form submission  
+@app.route('/update_profile', methods=['GET', 'POST'])  
+@login_required  
+def update_profile():  
+    user_id = session.get('user_id')  
+    if not user_id:  
+        return redirect(url_for('login'))  
+
+    if request.method == 'POST':  
+        email = request.form.get('email')  
+        name = request.form.get('name')  
+        address = request.form.get('address')  
+        gender = request.form.get('gender')  
+
+        # Validate email format  
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):  
+            flash('Invalid email address.', 'danger')  
+            return redirect(url_for('profile'))  
+
+        # Validate name (non-empty)  
+        if not name:  
+            flash('Name is required.', 'danger')  
+            return redirect(url_for('profile'))  
+
+        # Validate address (non-empty)  
+        if not address:  
+            flash('Address is required.', 'danger')  
+            return redirect(url_for('profile'))  
+
+        # Validate gender (must be one of the allowed values)  
+        allowed_genders = ['Male', 'Female', 'Other']  
+        if gender not in allowed_genders:  
+            flash('Invalid gender selection.', 'danger')  
+            return redirect(url_for('profile'))  
+
+        # Update the user in the database without changing the role  
+        conn = get_db_connection()  
+        try:  
+            conn.execute('UPDATE users SET email = ?, name = ?, address = ?, gender = ? WHERE id = ?',  
+                        (email, name, address, gender, user_id))  
+            conn.commit()  
+            flash('Profile updated successfully!', 'success')  
+        except sqlite3.Error as e:  
+            flash(f'An error occurred: {e}', 'danger')  
+        finally:  
+            conn.close()  
+
+        return redirect(url_for('profile'))  # Redirect to homepage after update  
+
+    # Fetch the user's current data for pre-filling the form  
+    conn = get_db_connection()  
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()  
+    conn.close()  
+
+    return render_template('profile', user=user) 
+
+
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query')
+    conn = get_db_connection()
+    
+    # Search products
+    products = conn.execute('''
+        SELECT * FROM products
+        WHERE title LIKE ? OR description LIKE ?
+    ''', ('%' + query + '%', '%' + query + '%')).fetchall()
+    
+    # Search stores
+    stores = conn.execute('''
+        SELECT * FROM stores
+        WHERE name LIKE ?
+    ''', ('%' + query + '%',)).fetchall()
+    
     conn.close()
-
-    return render_template('profile.php', user=user, orders=formatted_orders)
-
-@app.route('/search', methods=['GET'])  
-def search():  
-    query = request.args.get('query')  # Get the search query from the URL  
-    results = []  
-
-    if query:  
-        # Connect to the database  
-        with get_db_connection() as conn:  
-            # Search for products (you can modify this to search other tables)  
-            results = conn.execute("SELECT * FROM products WHERE title LIKE ? OR description LIKE ?",   
-                                ('%' + query + '%', '%' + query + '%')).fetchall()  
-
-    return render_template('search_results.ejs', query=query, results=results)  
+    return render_template('search_results.ejs', products=products, stores=stores, query=query) 
 
 @app.route('/suggestions', methods=['GET'])  
 def suggestions():  
@@ -1115,12 +1328,37 @@ def suggestions():
 
     if query:  
         with get_db_connection() as conn:  
-            # Search for products matching the query  
-            results = conn.execute("SELECT title FROM products WHERE title LIKE ?", ('%' + query + '%',)).fetchall()  
+            # Search for products and stores matching the query  
+            product_results = conn.execute("SELECT title FROM products WHERE title LIKE ?", ('%' + query + '%',)).fetchall()
+            store_results = conn.execute("SELECT name FROM stores WHERE name LIKE ?", ('%' + query + '%',)).fetchall()
+            results = product_results + store_results
 
     # Convert results to a list of dictionaries  
     suggestions = [{'title': row['title']} for row in results]  
-    return jsonify(suggestions)  # Return suggestions as JSON  
+    return jsonify(suggestions)  # Return suggestions as JSON
+
+@app.route('/stores', methods=['GET'])
+def stores():
+    categories=get_categories()
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    stores = conn.execute('SELECT * FROM stores').fetchall()
+    conn.close()
+    
+    conn = get_db_connection()
+    store = conn.execute('SELECT * FROM stores WHERE owner_id = ?', (user_id,)).fetchone()
+    conn.close()
+    return render_template('stores.php', stores=stores, store=store, categories=categories)
+
+@app.route('/store/<int:store_id>', methods=['GET'])
+def store_detail(store_id):
+    store, products = get_store_details(store_id)
+
+    if not store:
+        flash("Store not found.")
+        return redirect(url_for('homepage'))
+
+    return render_template('detail_stores.php', store=store, products=products)
 
 if __name__ == '__main__':  
     create_users_table()  # Create the users table when the app starts  
